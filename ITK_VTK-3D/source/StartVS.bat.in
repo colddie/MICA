@@ -1,0 +1,14 @@
+::--------------------------------------------------------
+::  By Huoling Luo (罗火灵) & Xiaodong Zhang (张晓东) 
+:: 
+::  罗火灵 QQ: 348774226 & MSN: shuiling119@hotmail.com
+::  张晓东 QQ: 285249802 & Email: zhangxd530@163.com
+:: 
+::--------------------------------------------------------
+
+@set CL=/D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE
+@set LINK=/LARGEADDRESSAWARE
+
+PATH=@PROJECT_RUNTIME_PATH@;%PATH%
+"@VS_SOLUTION_FILE@"
+
