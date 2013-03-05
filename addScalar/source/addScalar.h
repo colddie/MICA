@@ -3,6 +3,7 @@
 
 #include "itkAddImageFilter.h"
 #include "IO_type.h"
+#include "argumentsParse.h"
 
 
 namespace itk {
@@ -16,7 +17,6 @@ public:
     std::string inputfile;
     std::string outputfile;
     double index;
-    unsigned int dimension;
     unsigned int channels;
 
     /* Standard calss typedefs */

@@ -6,33 +6,56 @@
 
 int main(int argc, char** argv)
 {
-    /* check arguments number */
-    if( argc < 4)
-    {
-        std::cout<< "Usage:" << std::endl;
-        std::cout<< argv[0] <<" "<< "inputFile" << " "
-                 << "outputFile" << " " << "constant" << std::endl;
-        return EXIT_FAILURE;
-    }
+    //    /* check arguments number */
+    //    if( argc < 4)
+    //    {
+    //        std::cout<< "Usage:" << std::endl;
+    //        std::cout<< argv[0] <<" "<< "inputFile" << " "
+    //                 << "outputFile" << " " << "constant" << std::endl;
+    //        return EXIT_FAILURE;
+    //    }
 
 
 
-    /* read argument value */
-    const char *inputfile = argv[1];
-    const char *outputfile = argv[2];
-    const char *index = argv[3];
+    //    /* read argument value */
+    //    const char *inputfile = argv[1];
+    //    const char *outputfile = argv[2];
+    //    const char *index = argv[3];
+
+    std::string outputfile;
+    std::string inputfile;
+    double numtoadd;
     unsigned int dim;
     unsigned int channel;
-
     std::string imagetype;
 
 
+    const char *help[3] = {
+        "Usage: addS -input inputfile -index numbertoadd -output outputfile\n"
+        "Options:\n"
+        "-input         Name of the input image\n"
+        "-output        Name of the output image\n"
+        "-index         Number to add"
+    };
 
+
+    /* return all paras to main class */
+    ArgumentParser ap;
+    ap.SetCommandLineArg(argc, argv, help);
+
+    ap.MarkAsRequired("-input");
+    ap.MarkAsRequired("-output");
+    ap.MarkAsRequired("-index");
+    if (!ap.IsRequiredFound()) { exit(1); }
+
+    inputfile = ap.OneParse("-input");
+    outputfile = ap.OneParse("-output");
+    numtoadd = atof(ap.OneParse("-index").c_str());
 
 
     /* parse inputfile name to find the component type */
     IO_type io;
-    io.Create_IO(inputfile);
+    io.Create_IO(inputfile.c_str());
     imagetype = io.Return_ImageType();
     dim = io.Return_DimensionNumber();
     channel = io.Return_ChannelNumber();
@@ -43,14 +66,13 @@ int main(int argc, char** argv)
 
 
     /* return all paras to main class */
-    std::cout<<inputfile<<outputfile<<index<<" "<<dim<<imagetype<<channel<<std::endl;
+    std::cout<<inputfile<<outputfile<<numtoadd<<" "<<dim<<imagetype<<channel<<std::endl;
 
     itk::AddScalar::Pointer filter = itk::AddScalar::New();
 
-    filter->inputfile = std::string(inputfile);
-    filter->outputfile = std::string(outputfile);
-    filter->index = atof(index);
-    filter->dimension = dim;
+    filter->inputfile = inputfile;
+    filter->outputfile = outputfile;
+    filter->index = numtoadd;
     filter->channels = channel;
 
 
