@@ -1,7 +1,7 @@
 #ifndef _unaryImageFunctor_H_
 #define _unaryImageFunctor_H_
 
-
+#include "itkUnaryFunctorImageFilter.h"
 
 
 
@@ -160,10 +160,16 @@ public:
 };
 
 
+//template <class TInputImage>
+//inline void MultiPlyScalarFilter<TInputImage>::SetIndex (double & value)
+//{
+//    //        this->GetFunctor().SetIndex(InputRealType(value));
+//    this->GetFunctor().SetIndex(value);
+//}
 
+
+//}
 
 }
-
-
 
 #endif

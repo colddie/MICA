@@ -69,6 +69,7 @@ int main(int argc, char** argv) {
     //    itk::AddScalar::Pointer filter = itk::AddScalar::New();
 
     itk::AddScalarBase * filter = NULL;
+        std::transform(imagetype.begin(), imagetype.end(),imagetype.begin(), ::tolower); // to lower case
     itk::ImageIOBase::IOComponentType inputtype = itk::ImageIOBase::GetComponentTypeFromString(imagetype);
 
     if(!filter) filter = itk::AddScalar<char, 3>::New(3, inputtype);
@@ -79,6 +80,16 @@ int main(int argc, char** argv) {
     if(!filter) filter = itk::AddScalar<unsigned int, 3>::New(3, inputtype);
     if(!filter) filter = itk::AddScalar<float, 3>::New(3, inputtype);
     if(!filter) filter = itk::AddScalar<double, 3>::New(3, inputtype);
+
+
+    if(!filter) filter = itk::AddScalar<char, 2>::New(2, inputtype);
+    if(!filter) filter = itk::AddScalar<unsigned char, 2>::New(2, inputtype);
+    if(!filter) filter = itk::AddScalar<short, 2>::New(2, inputtype);
+    if(!filter) filter = itk::AddScalar<unsigned short, 2>::New(2, inputtype);
+    if(!filter) filter = itk::AddScalar<int, 2>::New(2, inputtype);
+    if(!filter) filter = itk::AddScalar<unsigned int, 2>::New(2, inputtype);
+    if(!filter) filter = itk::AddScalar<float, 2>::New(2, inputtype);
+    if(!filter) filter = itk::AddScalar<double, 2>::New(2, inputtype);
 
     filter->inputfile = inputfile;
     filter->outputfile = outputfile;

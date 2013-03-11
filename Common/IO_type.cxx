@@ -21,7 +21,7 @@ std::string IO_type::Return_ImageType() const
 
     std::string str = imageio->GetComponentTypeAsString(componentType);
     std::transform(str.begin(), str.end(),str.begin(), ::toupper);
-     //      imagetype = str.c_str();
+    //      imagetype = str.c_str();
     return str;
 
 }

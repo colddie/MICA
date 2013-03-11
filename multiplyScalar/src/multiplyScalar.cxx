@@ -69,7 +69,8 @@ int main(int argc, char** argv) {
     //    itk::MultiplyScalar::Pointer filter = itk::MultiplyScalar::New();
 
     itk::MultiplyScalarBase * filter = NULL;
-    itk::ImageIOBase::IOComponentType inputtype = itk::ImageIOBase::GetComponentTypeFromString(imagetype);
+    std::transform(imagetype.begin(), imagetype.end(),imagetype.begin(), ::tolower); // to lower case
+    itk::ImageIOBase::IOComponentType inputtype = itk::ImageIOBase::GetComponentTypeFromString(imagetype);    
 
     if(!filter) filter = itk::MultiplyScalar<char, 3>::New(3, inputtype);
     if(!filter) filter = itk::MultiplyScalar<unsigned char, 3>::New(3, inputtype);
@@ -79,6 +80,15 @@ int main(int argc, char** argv) {
     if(!filter) filter = itk::MultiplyScalar<unsigned int, 3>::New(3, inputtype);
     if(!filter) filter = itk::MultiplyScalar<float, 3>::New(3, inputtype);
     if(!filter) filter = itk::MultiplyScalar<double, 3>::New(3, inputtype);
+
+    if(!filter) filter = itk::MultiplyScalar<char, 2>::New(2, inputtype);
+    if(!filter) filter = itk::MultiplyScalar<unsigned char, 2>::New(2, inputtype);
+    if(!filter) filter = itk::MultiplyScalar<short, 2>::New(2, inputtype);
+    if(!filter) filter = itk::MultiplyScalar<unsigned short, 2>::New(2, inputtype);
+    if(!filter) filter = itk::MultiplyScalar<int, 2>::New(2, inputtype);
+    if(!filter) filter = itk::MultiplyScalar<unsigned int, 2>::New(2, inputtype);
+    if(!filter) filter = itk::MultiplyScalar<float, 2>::New(2, inputtype);
+    if(!filter) filter = itk::MultiplyScalar<double, 2>::New(2, inputtype);
 
     filter->inputfile = inputfile;
     filter->outputfile = outputfile;

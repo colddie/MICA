@@ -1,7 +1,6 @@
 #ifndef _addScalar_H_
 #define _addScalar_H_
 
-#include "itkUnaryFunctorImageFilter.h"
 #include "itkMeasurementVectorTraits.h"
 
 #include "unaryImageFunctor.h"

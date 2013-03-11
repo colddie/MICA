@@ -1,7 +1,6 @@
 #ifndef _multiplyScalar_H_
 #define _multiplyScalar_H_
 
-#include "itkUnaryFunctorImageFilter.h"
 #include "itkMeasurementVectorTraits.h"
 
 #include "unaryImageFunctor.h"

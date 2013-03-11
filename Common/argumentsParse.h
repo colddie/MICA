@@ -22,7 +22,7 @@ public:
     ~ArgumentParser(){};
 
     /* parse the commandline arguments */
-    void SetCommandLineArg(int argc, char *argv[], const string help[]);
+    void SetCommandLineArg(int argc, char *argv[], const char *help[]);
 
     /* -key with no arguments, return bool */
     bool BoolParse(const string &arg) const;
@@ -30,9 +30,9 @@ public:
     /* -key with one arguument, return string */
     string OneParse(const string &arg);
 
-    /* -key with multiple arguments, return vector */
+    /* -key with multiple arguments, return vector (overload)*/
     vector<string> MultiParse(const string &arg);
-
+    vector<double> MultiParse(const string &arg, const string &isnum);
 
     /* mark the required arguments */
     void MarkAsRequired(const string &arg);
