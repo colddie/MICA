@@ -18,6 +18,7 @@ public:
     ArgumentParser(){
     m_args.clear();
     m_required.clear();
+    m_optional_required.clear();
     };
     ~ArgumentParser(){};
 
@@ -30,12 +31,32 @@ public:
     /* -key with one arguument, return string */
     string OneParse(const string &arg);
 
+
     /* -key with multiple arguments, return vector (overload)*/
     vector<string> MultiParse(const string &arg);
-    vector<double> MultiParse(const string &arg, const string &isnum);
+
+    // have to overload here
+    template <class T>
+    inline vector<T> MultiParse(const string &arg, const string &isnum)
+    {
+        vector<string>::iterator iter;
+        iter = find(m_args.begin(), m_args.end(),arg);
+
+        vector<T> numvec;
+        string str = *(iter+1);
+        stringstream stream(str);
+        T num;
+        while(stream >> num) { numvec.push_back(num); }
+
+        return numvec;
+    }
+
+
 
     /* mark the required arguments */
     void MarkAsRequired(const string &arg);
+
+    void MarkOneOfAsRequired(const vector<string> &vec);
 
     /* check if all required arguments found */
     bool IsRequiredFound() const;
@@ -48,7 +69,7 @@ public:
     void DeleteArg(vector<string> &vec, const string &arg);
 
     /* delete -key without arguments from vector */
-    void DeleteBoolArg(vector<string> &vec, const string &arg);
+    void DeleteArg(vector<string> &vec, const string &arg, const char *isbool);
 
 
 
@@ -58,12 +79,12 @@ public:
 
 protected:
 
-    vector<string> m_args;
-    vector<string> m_required;
 
 
 private:
-
+    vector<string> m_args;
+    vector<string> m_required;
+    vector<string> m_optional_required;
 
 
 };

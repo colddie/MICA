@@ -45,16 +45,18 @@ public:
     /* Return the origin */
     std::vector<double> Return_Origin() const;
 
+    /* Return the direction */
+    itk::Matrix<double, 3, 3> Return_Direction() const;
 
-
-
+    /* Return the direcion in one axes */
+    std::vector<double> Return_Direction(unsigned int i) const;
 
 protected:
 
-    itk::ImageIOBase::Pointer imageio;
+
 
 private:
-
+    itk::ImageIOBase::Pointer imageio;
 
 
 };

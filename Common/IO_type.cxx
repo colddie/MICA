@@ -70,7 +70,7 @@ std::vector<unsigned int> IO_type::Return_DimensionSize() const
     dimsize.reserve(dim);
 
     /* Vector image or not */
-    std::string pixelType = Return_PixelType();
+    std::string pixelType = Return_PixelType();    //
     if (pixelType == "scalar") {
         for (int i=0; i<dim; i++) {
             dimsize.push_back(imageio->GetDimensions(i));
@@ -90,7 +90,7 @@ std::vector<unsigned int> IO_type::Return_DimensionSize() const
 std::vector<double> IO_type::Return_Spacing() const
 {
     std::vector<double> spacing;
-    unsigned int dim = imageio->GetNumberOfDimensions();
+    unsigned int dim = imageio->GetNumberOfDimensions();    //
     spacing.reserve(dim);
     for (int i=0; i<dim; i++) {
            spacing.push_back(imageio->GetSpacing(i));
@@ -104,7 +104,7 @@ std::vector<double> IO_type::Return_Spacing() const
 std::vector<double> IO_type::Return_Origin() const
 {
     std::vector<double> origin;
-    unsigned int dim = imageio->GetNumberOfDimensions();
+    unsigned int dim = imageio->GetNumberOfDimensions();    //
     origin.reserve(dim);
     for (int i=0; i<dim; i++) {
            origin.push_back(imageio->GetOrigin(i));
@@ -112,6 +112,48 @@ std::vector<double> IO_type::Return_Origin() const
 
 
     return origin;
+}
+
+
+
+/* Return the direction */
+itk::Matrix<double,3,3> IO_type::Return_Direction() const
+{
+    unsigned int dim = imageio->GetNumberOfDimensions();     //
+    itk::Matrix<double, 3, 3> mat;
+    std::vector<double> vec1, vec2, vec3;
+
+    vec1 = imageio->GetDirection(0);
+    vec2 = imageio->GetDirection(1);
+
+    for (int j=0; j<dim; j++) {
+        mat(0,j) = vec1[j];
+    }
+    for (int j=0; j<dim; j++) {
+        mat(1,j) = vec2[j];
+    }
+
+   if (dim==3) {
+       vec3 = imageio->GetDirection(2);
+       for (int j=0; j<dim; j++) {
+           mat(2,j) = vec3[j];
+       }
+   }
+
+   return mat;
+}
+
+/* Return the direcion in one axes */
+std::vector<double> IO_type::Return_Direction(unsigned int i) const
+{
+unsigned int dim = imageio->GetNumberOfDimensions();     //
+if (i>=dim) {
+    std::cout<<"Inexisted direction fro specified axes"<<std::endl;
+    exit(EXIT_FAILURE);
+}
+
+return imageio->GetDirection(i);
+
 }
 
 

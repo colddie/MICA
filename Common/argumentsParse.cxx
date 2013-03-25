@@ -60,62 +60,93 @@ vector<string> ArgumentParser::MultiParse(const string &arg)
 
 }
 
-vector<double> ArgumentParser::MultiParse(const string &arg, const string &isnum)
-{
-    vector<string>::iterator iter;
-    iter = find(m_args.begin(), m_args.end(),arg);
-    //    for (temp = first+1; temp != m_args.end(); temp++ ) {
-    //        if (strchr((*temp).c_str(), '-') != NULL) {
+//template <class T>
+//vector<T> ArgumentParser::MultiParse(const string &arg, const string &isnum)
+//{
+//    vector<string>::iterator iter;
+//    iter = find(m_args.begin(), m_args.end(),arg);
+//    //    for (temp = first+1; temp != m_args.end(); temp++ ) {
+//    //        if (strchr((*temp).c_str(), '-') != NULL) {
 
-    //            if (!IsANumber(*(temp+1))) {
-    //                last = temp;cout<<"negative detected";
-    //                break;
-    //            }
-    //        }
-    //    }
-    //cout<<*last;
+//    //            if (!IsANumber(*(temp+1))) {
+//    //                last = temp;cout<<"negative detected";
+//    //                break;
+//    //            }
+//    //        }
+//    //    }
+//    //cout<<*last;
 
-    //    last = find(first+1, m_args.end(), "-");   // need to check negative
+//    //    last = find(first+1, m_args.end(), "-");   // need to check negative
 
-    //    while (IsANumber(*(last+1)))
-    //    {
-    //        last = find(last, m_args.end(), "-");
-    //    }
-    vector<double> numvec;
-    string str = *(iter+1);
-    stringstream stream(str);
-    double num;
-    while(stream >> num) { numvec.push_back(num); }
+//    //    while (IsANumber(*(last+1)))
+//    //    {
+//    //        last = find(last, m_args.end(), "-");
+//    //    }
+//    vector<T> numvec;
+//    string str = *(iter+1);
+//    stringstream stream(str);
+//    T num;
+//    while(stream >> num) { numvec.push_back(num); }
 
-    return numvec;
+//    return numvec;
 
-//    vector<string> subvec(first+1, last);
-//    if (subvec.size()<2) { cout<<arg<<"wrong input number"<<endl; exit(1);}
-//    return subvec;
+////    vector<string> subvec(first+1, last);
+////    if (subvec.size()<2) { cout<<arg<<"wrong input number"<<endl; exit(1);}
+////    return subvec;
 
-}
+//}
 
 
 /* mark the required arguments */
 void ArgumentParser::MarkAsRequired(const string &arg)
 {
 
-    m_required.push_back(arg);
+    if (!binary_search(m_required.begin(), m_required.end(), arg)) {
+        m_required.push_back(arg);
+    }
 
 }
 
+
+/* mark one of the inputs as the required argument */
+void ArgumentParser::MarkOneOfAsRequired(const vector<string> &vec)
+{
+    m_optional_required.resize(vec.size());
+    copy(vec.begin(), vec.end(), m_optional_required.begin());
+
+}
 
 /* check if all required arguments found */
 bool ArgumentParser::IsRequiredFound() const
 {
     bool allrequiredexist = true;
-    for(unsigned int i=1; i<m_required.size(); i++) {
-        if (find(m_args.begin(), m_args.end(), m_required[i]) == m_args.end()) {
-            cout<<m_required[i]<<" is required but not specified"<<endl;
+    vector<string>::const_iterator iter;
+    for (iter = m_required.begin(); iter!=m_required.end(); iter++) {
+        if (find(m_args.begin(), m_args.end(), *iter) == m_args.end()) {
+            cout<<*iter<<" is required but not specified"<<endl;
             allrequiredexist = false;
         }
     }
 
+    // check if one of optional arguments exist
+    if (!m_optional_required.empty()) {
+        bool findone = false;
+        vector<string>::const_iterator iter1 = m_optional_required.begin();
+        while(!findone && iter1!=m_optional_required.end()) {
+
+
+                if (find(m_args.begin(), m_args.end(), *iter1) != m_args.end()) {
+
+                    findone = true;
+                    break;
+                }
+                iter1++;
+        }
+        if (!findone) {
+            cout<<"one of the option at least is required"<<endl;
+            allrequiredexist = false;
+        }
+    }
     return allrequiredexist;
 }
 
@@ -145,7 +176,7 @@ void ArgumentParser::DeleteArg(vector<string> &vec, const string &arg)
 
 
 /* delete -key without arguments from vector */
-void ArgumentParser::DeleteBoolArg(vector<string> &vec, const string &arg)
+void ArgumentParser::DeleteArg(vector<string> &vec, const string &arg, const char *isbool)
 {
     vector<string>::iterator iter;
     iter = find(vec.begin(), vec.end(),arg);
