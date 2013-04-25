@@ -1,20 +1,18 @@
 #include "argumentsParse.h"
 
 
+namespace std {
 
 
 /* -key with no arguments, return bool */
 bool ArgumentParser::BoolParse(const string &arg) const
 {
-
-    if (find(m_args.begin(), m_args.end(), arg) !=  m_args.end()) {
+    if (!binary_search(m_sortargs.begin(), m_sortargs.end(), arg)) {
         return true;
     } else {
         return false;
     }
-
 }
-
 
 
 /* -key with one arguument, return string */
@@ -22,11 +20,10 @@ string ArgumentParser::OneParse(const string &arg)
 {
     vector<string>::iterator iter;
     iter = find(m_args.begin(), m_args.end(), arg);
-    iter++;
+    ++iter;
     string returnstr = *iter;
 
     return returnstr;
-
 }
 
 
@@ -36,7 +33,7 @@ vector<string> ArgumentParser::MultiParse(const string &arg)
     vector<string>::iterator first, last, temp;
     last = m_args.end();
     first = find(m_args.begin(), m_args.end(),arg);
-    for (temp = first+1; temp != m_args.end(); temp++ ) {
+    for (temp = first+1; temp != m_args.end(); ++temp ) {
         if (strchr((*temp).c_str(), '-') != NULL) {
 
             if (!IsANumber(*(temp+1))) {
@@ -57,7 +54,6 @@ vector<string> ArgumentParser::MultiParse(const string &arg)
     vector<string> subvec(first+1, last);
     if (subvec.size()<2) { cout<<arg<<"wrong input number"<<endl; exit(1);}
     return subvec;
-
 }
 
 //template <class T>
@@ -100,11 +96,9 @@ vector<string> ArgumentParser::MultiParse(const string &arg)
 /* mark the required arguments */
 void ArgumentParser::MarkAsRequired(const string &arg)
 {
-
-    if (!binary_search(m_required.begin(), m_required.end(), arg)) {
+    if (find(m_required.begin(), m_required.end(), arg) != m_required.end()) {
         m_required.push_back(arg);
     }
-
 }
 
 
@@ -113,16 +107,16 @@ void ArgumentParser::MarkOneOfAsRequired(const vector<string> &vec)
 {
     m_optional_required.resize(vec.size());
     copy(vec.begin(), vec.end(), m_optional_required.begin());
-
 }
+
 
 /* check if all required arguments found */
 bool ArgumentParser::IsRequiredFound() const
 {
     bool allrequiredexist = true;
     vector<string>::const_iterator iter;
-    for (iter = m_required.begin(); iter!=m_required.end(); iter++) {
-        if (find(m_args.begin(), m_args.end(), *iter) == m_args.end()) {
+    for (iter = m_required.begin(); iter!=m_required.end(); ++iter) {
+        if (!binary_search(m_sortargs.begin(), m_sortargs.end(), *iter)) {
             cout<<*iter<<" is required but not specified"<<endl;
             allrequiredexist = false;
         }
@@ -135,12 +129,12 @@ bool ArgumentParser::IsRequiredFound() const
         while(!findone && iter1!=m_optional_required.end()) {
 
 
-                if (find(m_args.begin(), m_args.end(), *iter1) != m_args.end()) {
+                if (!binary_search(m_sortargs.begin(), m_sortargs.end(), *iter1)) {
 
                     findone = true;
                     break;
                 }
-                iter1++;
+                ++iter1;
         }
         if (!findone) {
             cout<<"one of the option at least is required"<<endl;
@@ -151,17 +145,6 @@ bool ArgumentParser::IsRequiredFound() const
 }
 
 
-/* check if argument is a negative number, for MultiParse function */
-bool ArgumentParser::IsANumber(const string &arg) const
-{
-    string cliphead = arg.substr(0, 1);
-    bool isnumber = isdigit(cliphead.c_str()[0]);
-
-    return isnumber;
-}
-
-
-
 /* delete -key with one argument from vector*/
 void ArgumentParser::DeleteArg(vector<string> &vec, const string &arg)
 {
@@ -169,9 +152,8 @@ void ArgumentParser::DeleteArg(vector<string> &vec, const string &arg)
     iter = find(vec.begin(), vec.end(),arg);
     if (iter == vec.end()) { cout<<arg<<"delete arg error"<<endl; exit(1); }
     iter = vec.erase(iter);
-    iter++;
+    ++iter;
     vec.erase(iter);
-
 }
 
 
@@ -182,9 +164,7 @@ void ArgumentParser::DeleteArg(vector<string> &vec, const string &arg, const cha
     iter = find(vec.begin(), vec.end(),arg);
     if (iter == vec.end()) { cout<<arg<<"delete arg error"<<endl; exit(1); }
     vec.erase(iter);
-
 }
-
 
 
 /* parse the commandline arguments */
@@ -196,5 +176,20 @@ void ArgumentParser::SetCommandLineArg(int argc, char *argv[], const char *help[
     if (m_args.empty() || m_args.size() == 1) {
         cout<<(*help)<<endl; exit(EXIT_FAILURE);
     }
+    m_sortargs.reserve(argc-1);
+    copy(m_args.begin(),m_args.end(),m_sortargs.begin());
+    sort(m_sortargs.begin(),m_sortargs.end());
+}
+
+
+/* check if argument is a negative number, for MultiParse function */
+bool ArgumentParser::IsANumber(const string &arg) const
+{
+    // get the first chracter
+    string cliphead = arg.substr(0, 1);
+    bool isnumber = isdigit(cliphead.c_str()[0]);
+
+    return isnumber;
+}
 
 }

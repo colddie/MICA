@@ -5,6 +5,8 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkMetaImageIO.h"
+#include "itkMatrix.h"
+#include "itkImageIOBase.h"
 
 #include <string>
 

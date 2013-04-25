@@ -1,5 +1,6 @@
 #include "IO_type.h"
 
+
 using namespace itk;
 
 
@@ -10,7 +11,6 @@ std::string IO_type::Return_ByteOrder() const
 
     std::string str = imageio->GetByteOrderAsString(byteorder);
     return str;
-
 }
 
 
@@ -23,7 +23,6 @@ std::string IO_type::Return_ImageType() const
     std::transform(str.begin(), str.end(),str.begin(), ::toupper);
     //      imagetype = str.c_str();
     return str;
-
 }
 
 
@@ -34,14 +33,12 @@ std::string IO_type::Return_PixelType() const
 
     std::string str = imageio->GetPixelTypeAsString(pixelType);
     return str;
-
 }
 
 
 /* Return the image dimesion number */
 unsigned int IO_type::Return_DimensionNumber() const
 {
-
     unsigned int dim = imageio->GetNumberOfDimensions();
 
     /* Vector image or not */
@@ -56,7 +53,6 @@ unsigned int IO_type::Return_DimensionNumber() const
 /* Return the image component number */
 unsigned int IO_type::Return_ChannelNumber() const
 {
-
     unsigned int channel = imageio->GetNumberOfComponents();
     return channel;
 }
@@ -72,11 +68,11 @@ std::vector<unsigned int> IO_type::Return_DimensionSize() const
     /* Vector image or not */
     std::string pixelType = Return_PixelType();    //
     if (pixelType == "scalar") {
-        for (int i=0; i<dim; i++) {
+        for (unsigned int i=0; i<dim; i++) {
             dimsize.push_back(imageio->GetDimensions(i));
         }
     } else if (pixelType == "vector") {
-        for (int i=0; i<dim-1; i++) {
+        for (unsigned int i=0; i<dim-1; i++) {
         dimsize.push_back(imageio->GetDimensions(i));
         }
         unsigned int channel = imageio->GetNumberOfComponents();
@@ -92,7 +88,7 @@ std::vector<double> IO_type::Return_Spacing() const
     std::vector<double> spacing;
     unsigned int dim = imageio->GetNumberOfDimensions();    //
     spacing.reserve(dim);
-    for (int i=0; i<dim; i++) {
+    for (unsigned int i=0; i<dim; i++) {
            spacing.push_back(imageio->GetSpacing(i));
     }
 
@@ -106,14 +102,11 @@ std::vector<double> IO_type::Return_Origin() const
     std::vector<double> origin;
     unsigned int dim = imageio->GetNumberOfDimensions();    //
     origin.reserve(dim);
-    for (int i=0; i<dim; i++) {
+    for (unsigned int i=0; i<dim; i++) {
            origin.push_back(imageio->GetOrigin(i));
     }
-
-
     return origin;
 }
-
 
 
 /* Return the direction */
@@ -126,41 +119,39 @@ itk::Matrix<double,3,3> IO_type::Return_Direction() const
     vec1 = imageio->GetDirection(0);
     vec2 = imageio->GetDirection(1);
 
-    for (int j=0; j<dim; j++) {
+    for (unsigned int j=0; j<dim; j++) {
         mat(0,j) = vec1[j];
     }
-    for (int j=0; j<dim; j++) {
+    for (unsigned int j=0; j<dim; j++) {
         mat(1,j) = vec2[j];
     }
 
    if (dim==3) {
        vec3 = imageio->GetDirection(2);
-       for (int j=0; j<dim; j++) {
+       for (unsigned int j=0; j<dim; j++) {
            mat(2,j) = vec3[j];
        }
    }
-
    return mat;
 }
+
 
 /* Return the direcion in one axes */
 std::vector<double> IO_type::Return_Direction(unsigned int i) const
 {
-unsigned int dim = imageio->GetNumberOfDimensions();     //
-if (i>=dim) {
-    std::cout<<"Inexisted direction fro specified axes"<<std::endl;
-    exit(EXIT_FAILURE);
-}
+    unsigned int dim = imageio->GetNumberOfDimensions();     //
+    if (i>=dim) {
+        std::cout<<"Inexisted direction fro specified axes"<<std::endl;
+        exit(EXIT_FAILURE);
+    }
 
-return imageio->GetDirection(i);
-
+    return imageio->GetDirection(i);
 }
 
 
 /* Create ImageIO */
 void IO_type::Create_IO(const char *a)
 {
-
     /* Use ImageIOFactory to automaticlly identify the IO */
     ImageIOBase::Pointer ImageIO =  ImageIOFactory::CreateImageIO(a, ImageIOFactory::ReadMode);
     if(!ImageIO->CanReadFile(a)) {
@@ -171,14 +162,7 @@ void IO_type::Create_IO(const char *a)
     ImageIO->SetFileName(a);
     ImageIO->ReadImageInformation();
     imageio = ImageIO;
-
 }
-
-
-
-
-
-
 
 
 //      /* Main func to get image componenttype */
@@ -227,8 +211,3 @@ void IO_type::Create_IO(const char *a)
 
 
 //}
-
-
-
-
-

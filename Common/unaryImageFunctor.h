@@ -7,7 +7,9 @@
 
 namespace itk {
 
-/* All functor defined below */
+
+/** All functor defined below */
+
   namespace Functor {
 
   /* Add scalar functor */
@@ -31,7 +33,7 @@ namespace itk {
             //              return output;
             output = A+m_Add;
             return output;
-            }
+        }
 
         void SetIndex(double & value)
         { m_Add = value; }
@@ -70,7 +72,7 @@ namespace itk {
               //              return output;
               output = A*m_Multiply;
               return output;
-              }
+          }
 
           void SetIndex(double & value)
           { m_Multiply = value; }
@@ -90,7 +92,7 @@ namespace itk {
 
 
 
-/* All filter defined below */
+/** All filter defined below */
 
   /* Add scalar filter */
   template <class TInputImage>
@@ -171,5 +173,6 @@ public:
 //}
 
 }
+
 
 #endif

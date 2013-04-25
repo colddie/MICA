@@ -3,12 +3,11 @@
 
 #include "itkObject.h"
 
-
 #include <string>
 #include <vector>
 #include <algorithm>
 
-using namespace std;
+namespace std {
 
 
 class ArgumentParser : public itk::Object
@@ -52,7 +51,6 @@ public:
     }
 
 
-
     /* mark the required arguments */
     void MarkAsRequired(const string &arg);
 
@@ -60,10 +58,6 @@ public:
 
     /* check if all required arguments found */
     bool IsRequiredFound() const;
-
-    /* check if argument is a negative number, for MultiParse function */
-    bool IsANumber(const string &arg) const;
-
 
     /* delete -key with one argument from vector*/
     void DeleteArg(vector<string> &vec, const string &arg);
@@ -73,19 +67,23 @@ public:
 
 
 
-
-
-
-
 protected:
 
 
 
 private:
     vector<string> m_args;
+    vector<string> m_sortargs;
     vector<string> m_required;
     vector<string> m_optional_required;
 
+    /* check if argument is a negative number, for MultiParse function */
+    bool IsANumber(const string &arg) const;
+
 
 };
+
+}
+
+
 #endif
