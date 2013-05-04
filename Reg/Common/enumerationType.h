@@ -1,0 +1,45 @@
+#ifndef _enumerationType_H_
+#define _enumerationType_H_
+
+
+
+
+enum Transform_Type {
+    TRANSFORM_TRANSLATION,
+    TRANSFORM_VERSOR3D,
+    TRANSFORM_QUATERNION,
+    TRANSFORM_AFFINE,
+    TRANSFORM_BSPLINE
+};
+
+enum Metric_Type {
+    METRIC_MSE,
+    METRIC_MI,
+    METRIC_MATTESMI
+};
+
+enum InterPolator_Type {
+    INTERPOLATOR_LINEAR,
+    INTERPOLATOR_NEARESTNEIGHBOUR,
+    INTERPOLATOR_BSPLINEINTER
+};
+
+enum Optimizer_Type {
+    OPTIMIZER_VERSOR3D,
+    OPTIMIZER_QUATERNION,
+    OPTIMIZER_AMOEBA,
+    OPTIMIZER_RSGD,
+    OPTIMIZER_LBFGS,
+    OPTIMIZER_LBFGSB
+};
+
+
+
+
+
+
+
+
+
+
+#endif

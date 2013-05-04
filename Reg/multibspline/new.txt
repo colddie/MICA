@@ -1,0 +1,49 @@
+#Bspline
+
+#GENERAL
+fixed_image = 2cm_5.mha
+moving_image = testwarp.mha
+warped_image = warp.mha
+deformation_field = vector.mha
+
+level_number = 3
+#thread_number = 4
+
+#STAGE
+transform = bspline
+metric = mse
+interpolator = linear
+optimizer = rsgd
+
+grid_spacing = 30 30 30
+down_sample = 1 1 1
+
+max_iter = 50
+#conv_factor = 1e+7
+#grad_tolerance = 1e-4
+
+#STAGE
+transform = bspline
+metric = mse
+interpolator = linear
+optimizer = rsgd
+
+grid_spacing = 20 20 20
+down_sample = 1 1 1
+
+max_iter = 20
+#conv_factor = 1e+7
+#grad_tolerance = 1e-4
+
+#STAGE
+transform = bspline
+metric = mse
+interpolator = linear
+optimizer = rsgd
+
+grid_spacing = 15 15 15
+down_sample = 1 1 1
+
+max_iter = 50
+#conv_factor = 1e+7
+#grad_tolerance = 1e-4
