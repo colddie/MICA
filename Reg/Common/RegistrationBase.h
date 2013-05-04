@@ -107,8 +107,8 @@ protected:
                            std::vector<TImage::Pointer> &movingImageArray);
 
     void BuildOptimizer(const RegistrationType::Pointer registration,
-                        const Optimizer_Type &opttype,
-                        const unsigned int &maxiteration) const;
+//                        const Optimizer_Type &opttype,
+                        const Parameters &par) const;
 
     void SetScales(const RegistrationType::Pointer registration,
                    const Transform_Type &transformtype) const;

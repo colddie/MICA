@@ -17,38 +17,57 @@ using namespace std;
 void Parameters::SetInitialParameters()
 {
 
+    // Assume GLOBAL already given
+    //general
+    transformtype = TRANSFORM_VERSOR3D;
+    metrictype = METRIC_MSE;
+    interpolatortype = INTERPOLATOR_LINEAR;
+    optimizertype = OPTIMIZER_RSGD;
+
+    maximumiteration = 25;
+
+
+    //metric
+    fixedimagestandarddeviation = 0.4;
+    movingimagestandarddeviation = 0.4;
+
+    numberofhistogrambins = 20;
+    numberofspatialsamples = 10000;
+
+    //optimizer
+    maximumsteplength = 0.5;
+    minimumsteplength = 10;
+
+    learningrate = 0.01;
+
+    parametersconvergencetolerance = 0.05;
+    functionconvergencetolerance = 10000;
+
+    relaxationfactor = 0.5;
+
+    gradientconvergencetolerance = 0.1;
+    linesearchaccurancy = 0.9;
+    defaultsteplength = 1.5;
+    maximumnumberoffunctionevaluations = 1000;
+
+    costfunctionconvergencefactor = 1e+7;
+    projectedgradienttolerance = 1e-4;
+    maximumnumberofcorrections = 12;
+
+
+    //bspline
+    gridspacing.push_back(20);
+    gridspacing.push_back(20);
+    gridspacing.push_back(20);
+
+    gridnode = 6;
+
 }
 
 
-void Parameters::CheckParameters()
-{
-//    std::cout<<gridspacing<<downsample;
-//    for (unsigned int i=0; i<levelnumber; i++) {
-//        // default gridspacing
-//        if (gridspacing[i*3]==0) {
-//            gridspacing[i*3]=20;
-//            gridspacing[i*3+1]=20;
-//            gridspacing[i*3+2]=20;
-//        }
-//        // default gridnode
-//        if (gridnode[i]==0) {
-//            gridnode[i]=8;
-//        }
-//        // default downsample
-//        if (downsample[i*3]==0) {
-//            downsample[i*3]=1;
-//            downsample[i*3+1]=1;
-//            downsample[i*3+2]=1;
-//        }
-
-//    }
-
-
-
-
-
-
-}
+//void Parameters::CheckParameters()
+//{
+//}
 
 
 void Parameters::ReadParameters(const char *parfile, const unsigned int &stage)
@@ -87,9 +106,10 @@ void Parameters::ReadParameters(const char *parfile, const unsigned int &stage)
     string block = s.substr(block_begin, block_end);
     //        string block = string(iter, iter_next);
 
+    // has to initialized this way
     stringstream ss;
     ss.str(block);
-//cout<<block;
+    //cout<<block;
 
     string line;
     unsigned int pos;
@@ -171,6 +191,8 @@ void Parameters::ReadParameters(const char *parfile, const unsigned int &stage)
             line.erase(0,pos+1);
             line = trim(line, " \t");
             sscanf(line.c_str(), "%d%d%d", &sx, &sy, &sz);
+
+            gridspacing.clear();
             gridspacing.push_back(sx);
             gridspacing.push_back(sy);
             gridspacing.push_back(sz);

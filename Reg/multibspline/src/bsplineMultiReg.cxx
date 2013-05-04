@@ -65,8 +65,7 @@ void BsplineMultiReg::Update(Global &var, std::vector<Parameters> &par)
     BuildTransform(par[m_currentLevel].gridnode);
     if (m_currentLevel != 0) { GoToNextResolution(); }
 
-    BuildOptimizer(_registration, par[m_currentLevel].optimizertype,
-                   par[m_currentLevel].maximumiteration
+    BuildOptimizer(_registration, par[m_currentLevel]
                    );
 
     AddObserver(_registration, par[m_currentLevel].optimizertype

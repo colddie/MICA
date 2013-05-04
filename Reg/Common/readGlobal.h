@@ -30,17 +30,6 @@ public:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
     Global(){};
     ~Global(){};
 

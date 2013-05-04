@@ -94,7 +94,7 @@ void AssignPointer::SetMetric(const RegistrationType::Pointer registration,
         normalized to a mean of zero and unit variance.  We
         will follow this empirical rule in this example. */
         MIMetricType::Pointer metric = MIMetricType::New();
-        metric->SetFixedImageStandardDeviation(  0.4 );
+        metric->SetFixedImageStandardDeviation( 0.4 );
         metric->SetMovingImageStandardDeviation( 0.4 );
         registration->SetMetric(metric);break;
     }
@@ -244,17 +244,17 @@ void AssignPointer::InitializePyramid(const unsigned int &level,const std::strin
 
 /* Set optimizer */
 void AssignPointer::BuildOptimizer(const RegistrationType::Pointer registration,
-                                   const Optimizer_Type &opttype,
-                                   const unsigned int &maxiteration) const
+//                                   const Optimizer_Type &opttype,
+                                   const Parameters &par) const
 {
-    switch (opttype) {
+    switch (par.optimizertype) {
     case OPTIMIZER_VERSOR3D:
     {
         typedef VersorOptimizerType *OptimizerPointer;
         OptimizerPointer optimizer = dynamic_cast<OptimizerPointer>(registration->GetOptimizer());
         optimizer->SetMaximumStepLength(0.5);
         optimizer->SetMinimumStepLength(0.0001);
-        optimizer->SetNumberOfIterations(maxiteration); break;
+        optimizer->SetNumberOfIterations(par.maximumiteration); break;
     }
 
     case OPTIMIZER_QUATERNION:
@@ -262,7 +262,7 @@ void AssignPointer::BuildOptimizer(const RegistrationType::Pointer registration,
         typedef QuaternionOptimizerType *OptimizerPointer;
         OptimizerPointer optimizer = dynamic_cast<OptimizerPointer>(registration->GetOptimizer());
         optimizer->SetLearningRate(0.01);
-        optimizer->SetNumberOfIterations(maxiteration); break;
+        optimizer->SetNumberOfIterations(par.maximumiteration); break;
     }
 
     case OPTIMIZER_AMOEBA:
@@ -271,7 +271,7 @@ void AssignPointer::BuildOptimizer(const RegistrationType::Pointer registration,
         OptimizerPointer optimizer = dynamic_cast<OptimizerPointer>(registration->GetOptimizer());
         optimizer->SetParametersConvergenceTolerance(0.05);
         optimizer->SetFunctionConvergenceTolerance(10000);  // Was 10000
-        optimizer->SetMaximumNumberOfIterations(100); break;
+        optimizer->SetMaximumNumberOfIterations(par.maximumiteration); break;
     }
 
     case OPTIMIZER_RSGD:
@@ -280,7 +280,7 @@ void AssignPointer::BuildOptimizer(const RegistrationType::Pointer registration,
         OptimizerPointer optimizer = dynamic_cast<OptimizerPointer>(registration->GetOptimizer());
         optimizer->SetMaximumStepLength(1);
         optimizer->SetMinimumStepLength(0.001);
-        optimizer->SetNumberOfIterations(maxiteration); break;
+        optimizer->SetNumberOfIterations(par.maximumiteration); break;
         optimizer->SetRelaxationFactor(0.5);
 
     }
@@ -322,8 +322,8 @@ void AssignPointer::BuildOptimizer(const RegistrationType::Pointer registration,
         optimizer->SetCostFunctionConvergenceFactor (1e+7);
         optimizer->SetProjectedGradientTolerance (1e-4);
         //optimizer->SetProjectedGradientTolerance (1.5);
-        optimizer->SetMaximumNumberOfIterations (maxiteration);
-        optimizer->SetMaximumNumberOfEvaluations (maxiteration);
+        optimizer->SetMaximumNumberOfIterations (par.maximumiteration);
+        optimizer->SetMaximumNumberOfEvaluations (par.maximumiteration);
         optimizer->SetMaximumNumberOfCorrections (12); break;
     }
 

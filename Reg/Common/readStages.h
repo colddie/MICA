@@ -24,38 +24,53 @@ class Parameters {
 
 public:
 
-//    // Must specified
-//    std::string inputfile1;
-//    std::string inputfile2;
-//    std::string outputfile;
-//    std::string outputdeformfile;
-
-//    unsigned int levelnumber;
-//    std::vector<unsigned int> maximumiteration;
-//    std::vector<Transform_Type> transformtype;
-//    std::vector<Metric_Type> metrictype;
-//    std::vector<InterPolator_Type> interpolatortype;
-//    std::vector<Optimizer_Type> optimizertype;
+    // Optional, given default
     unsigned int maximumiteration;
     Transform_Type transformtype;
     Metric_Type metrictype;
     InterPolator_Type interpolatortype;
     Optimizer_Type optimizertype;
 
-    // Optional, given default
+    // Metric
+    double fixedimagestandarddeviation;
+    double movingimagestandarddeviation;
+    unsigned int numberofhistogrambins;
+    unsigned int numberofspatialsamples;
+
+    // Optimizer
+    double maximumsteplength;
+    double minimumsteplength;
+
+    double learningrate;
+
+    double parametersconvergencetolerance;
+    double functionconvergencetolerance;
+
+    double relaxationfactor;
+
+    double gradientconvergencetolerance;
+    double linesearchaccurancy;
+    double defaultsteplength;
+    double maximumnumberoffunctionevaluations;
+
+    double costfunctionconvergencefactor;
+    double projectedgradienttolerance;
+    unsigned int maximumnumberofcorrections;
+
+
+
+    // Bspline
     std::vector<unsigned int> gridspacing;
-//    std::vector<unsigned int> gridnode;
     unsigned int gridnode;
-//    std::vector<unsigned int> downsample;
+
+    // Demons
 
 
+
+    // Public interface
     void SetInitialParameters();
     void ReadParameters(const char *parfile, const unsigned int &stage);
-//    void ReadFileName(const std::string &line, const std::string &label);
-//    void ReadLevelNumber(const std::string &line);
-//    void ReadSingleNumberATime(const std::string &line, const std::string &label);
-//    void ReadTribleNumberATime(const std::string &line, const std::string &label);
-    void CheckParameters();
+
 
     Parameters(){};
     ~Parameters(){};
@@ -66,9 +81,6 @@ private:
 
 
 };
-
-
-
 
 
 
