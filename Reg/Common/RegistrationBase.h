@@ -2,7 +2,8 @@
 #define REGISTERATIONTYPE_H
 
 #include "enumerationType.h"
-#include "readFromFile.h"
+#include "readGlobal.h"
+#include "readStages.h"
 
 #include "itkImageRegistrationMethod.h"
 //#include "itkMultiResolutionImageRegistrationMethod.h"
@@ -38,28 +39,30 @@ class AssignPointer: public itk::Object
 {
 public:
 
-    Parameters m_par;
-    // define for derived class only
-//    std::string m_fixedFile;
-//    std::string m_movingFile;
-//    std::string m_outputFile;
-//    std::string m_outputDeformFile;
-//    unsigned int m_levelNumber;
-//    std::vector<unsigned int> m_gridNode;
-//    std::vector<unsigned int> m_downSample;
-//    std::vector<unsigned int> m_maxIteration;
-
-//    std::vector<Transform_Type> m_transformType;
-//    std::vector<Metric_Type> m_metricType;
-//    std::vector<InterPolator_Type> m_interpolatorType;
-//    std::vector<Optimizer_Type> m_optimizerType;
-
+    // public member from parameter class
 
     AssignPointer()
     {};
     virtual ~AssignPointer()
     {};
 
+
+protected:
+
+    // define for derived class only
+    //    std::string m_fixedFile;
+    //    std::string m_movingFile;
+    //    std::string m_outputFile;
+    //    std::string m_outputDeformFile;
+    //    unsigned int m_levelNumber;
+    //    std::vector<unsigned int> m_gridNode;
+    //    std::vector<unsigned int> m_downSample;
+    //    std::vector<unsigned int> m_maxIteration;
+
+    //    std::vector<Transform_Type> m_transformType;
+    //    std::vector<Metric_Type> m_metricType;
+    //    std::vector<InterPolator_Type> m_interpolatorType;
+    //    std::vector<Optimizer_Type> m_optimizerType;
 
     // general type and global variables
     typedef double InputType;
@@ -81,7 +84,7 @@ public:
     typedef itk::LBFGSOptimizer LBFGSOptimizerType;
     typedef itk::LBFGSBOptimizer LBFGSBOptimizerType;
 
-    // public function for derived class
+    // protected function for derived class
     //    int SetRegistration(const unsigned int &thread_num);
     void SetImages(const RegistrationType::Pointer registration,
                    const ImagePointer fixed,
@@ -125,12 +128,18 @@ public:
                              const std::string outputdeformfile
                              ) const;
 
+public:
+
+    // public function for derived class
+
     // overload in derived class
-//    virtual void SetTransform() = 0;
-    virtual void Update() = 0;
+    //    virtual void SetTransform() = 0;
+    virtual void Initialize(Global &var) = 0;
+    virtual void Update(Global &var, std::vector<Parameters> &par) = 0;
+    virtual void Write(Global &var) = 0;
 
 
-  private:
+private:
 
     typedef itk::MeanSquaresImageToImageMetric<TImage, TImage> MSEMetricType;
     typedef itk::MutualInformationImageToImageMetric<TImage, TImage> MIMetricType;
