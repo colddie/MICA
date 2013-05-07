@@ -1,0 +1,37 @@
+#Rigid
+
+#GENERAL
+fixed_image = 2cm_5.mha
+moving_image = 2cm_1.mha
+warped_image = testwarp.mha
+deformation_field = vector.mha
+
+level_number = 3
+#thread_number = 4
+
+#STAGE
+transform = rigid
+metric = mse
+interpolator = linear
+optimizer = versor
+
+down_sample = 4 4 4
+max_iter = 100
+
+#STAGE
+transform = rigid
+metric = mse
+interpolator = linear
+optimizer = versor
+
+down_sample = 2 2 2
+max_iter = 50
+
+#STAGE
+transform = rigid
+metric = mse
+interpolator = linear
+optimizer = versor
+
+down_sample = 1 1 1
+max_iter = 50

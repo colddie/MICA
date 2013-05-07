@@ -1,0 +1,37 @@
+#Affine
+
+#GENERAL
+fixed_image = 2cm_5.mha
+moving_image = 2cm_1.mha
+warped_image = testwarp.mha
+deformation_field = vector.mha
+
+level_number = 3
+#thread_number = 4
+
+#STAGE
+transform = affine
+metric = mse
+interpolator = linear
+optimizer = lbfgsb
+
+down_sample = 4 4 4
+max_iter = 200
+
+#STAGE
+transform = affine
+metric = mse
+interpolator = linear
+optimizer = lbfgsb
+
+down_sample = 2 2 2
+max_iter = 1000
+
+#STAGE
+transform = affine
+metric = mse
+interpolator = linear
+optimizer = lbfgsb
+
+down_sample = 1 1 1
+max_iter = 100
