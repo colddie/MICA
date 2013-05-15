@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 
 PROJECT(Viewer)
 
+
 if( NOT CMAKE_BUILD_TYPE )
 
-  set( CMAKE_BUILD_TYPE Debug CACHE STRING
+  set( CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
        "Choose the type of build, options are: None Debug Release RelWithDebInfo
 MinSizeRel."
        FORCE )
@@ -29,6 +30,59 @@ endif(VTK_FOUND)
 #----------------------------------------------------------------------------
 FIND_PACKAGE(Qt4 REQUIRED)
 INCLUDE(${QT_USE_FILE})
+
+#----------------------------------------------------------------------------
+FIND_PACKAGE(CTK)
+INCLUDE(${CTK_USE_FILE})
+
+#----------------------------------------------------------------------------
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/Cmake/Modules/")
+
+#INCLUDE(${CMAKE_MODULE_PATH}/QxtConfig.cmake)
+#INCLUDE(${CMAKE_MODULE_PATH}/QwtConfig.cmake)
+
+#FIND_PACKAGE(Qxt)
+#SET(QXT_FIND_COMPONENTS QxtCore, QxtGui)
+#SET(QXT_USE_QXTCORE TRUE)
+#SET(QXT_USE_QXTGUI TRUE)
+#INCLUDE_DIRECTORIES(${QXT_INCLUDE_DIRS})
+
+FIND_PACKAGE(Qwt)
+INCLUDE_DIRECTORIES(${QWT_INCLUDE_DIRS})
+
+FIND_PATH(QXT_INCLUDE_CORE
+    NAMES Qxt QxtCore
+	HINTS ${QT_INCLUDE_CORE})
+FIND_PATH(QXT_INCLUDE_GUI
+    NAMES Qxt QxtGui
+	HINTS ${QT_INCLUDE_GUI})
+SET(QXT_INCLUDE_DIRS ${QXT_INCLUDE_CORE} ${QXT_INCLUDE_GUI})
+INCLUDE_DIRECTORIES(${QXT_INCLUDE_DIRS})
+		
+FIND_LIBRARY(QXT_LIBRARY_CORE
+    NAMES QxtCore
+	HINTS ${QT_LIBRARY_DIR})
+FIND_LIBRARY(QXT_LIBRARY_GUI
+    NAMES QxtGui
+	HINTS ${QT_LIBRARY_DIR})	
+	SET(QXT_LIBRARIES ${QXT_LIBRARY_CORE} ${QXT_LIBRARY_GUI})
+    
+#----------------------------------------------------------------------------
+#SET(QWT_LIBRARIES "C:/Qwt-6.0.1/lib")
+#SET(QWT_INCLUDE_DIR "C:/Qwt-6.0.1/include")
+#INCLUDE_DIRECTORIES(${QWT_INCLUDE_DIR})
+#LINK_LIBRARIES(${QWT_LIBRARIES})
+#FILE(GLOB QWT_LIBRARIES "${QWT_LIBRARIES}/*.*")
+
+#----------------------------------------------------------------------------
+#SET(QXT_LIBRARIES "C:/Qxt/lib")
+#SET(QXT_INCLUDE_DIR "C:/Qxt/include/QxtCore" /
+#                     "C:/Qxt/include/QxtGui")
+#INCLUDE_DIRECTORIES(${QXT_INCLUDE_DIR})
+#LINK_DIRECTORIES(${QXT_LIBRARIES})
+#FILE(GLOB QXT_LIBRARIES "${QXT_LIBRARIES}/*.*")
+
+
 
 
 # use what QVTK built with
@@ -81,12 +135,12 @@ QT4_ADD_RESOURCES(ResourceSrcs Icons/icons.qrc)
   # SET (SimpleViewSrcs ${SimpleViewSrcs} ${SimpleViewUI})
 # ENDIF (${CMAKE_BUILD_TOOL} MATCHES "devenv")
 
-set ( COMMON_DIRECTORIES  "G:/Common" )
+SET( COMMON_DIRECTORIES  "G:/Common" )
 #mark_as_advanced ( COMMON_DIRECTORIES )
 #set( COMMON_DIRECTORIES "${COMMON_DIRECTORIES}")
-include_directories (${COMMON_DIRECTORIES})
+INCLUDE_DIRECTORIES(${COMMON_DIRECTORIES})
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
-file (GLOB COMMON_DIRECTORIES "${COMMON_DIRECTORIES}/*.*")
+FILE(GLOB COMMON_DIRECTORIES "${COMMON_DIRECTORIES}/*.*")
 
 SET(COMMONSrcs itkImageToVTKImageFilter.txx itkImageToVTKImageFilter.h ${COMMON_DIRECTORIES})
 
@@ -102,6 +156,9 @@ TARGET_LINK_LIBRARIES( Viewer
   vtkCommon
   vtkInfovis
   vtkViews
+  ${CTK_LIBRARIES}
+  ${QXT_LIBRARIES}
+  ${QWT_LIBRARIES}
 )
 
 

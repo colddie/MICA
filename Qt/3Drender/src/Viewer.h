@@ -35,42 +35,43 @@ class Viewer : public QMainWindow
 
 public:
 
-  // Constructor/Destructor
-//    Viewer(int windowhigh, int windowlow, string filename);
+    // Constructor/Destructor
+    //    Viewer(int windowhigh, int windowlow, string filename);
     Viewer();
     ~Viewer();
 
-  void Initialize();
-  void SetVolumeProperty();
-  void UpdateWidget();
 
 signals:
 
 
 public slots:
 
-  virtual void slotOpenFile();
-  virtual void slotExit();
-  virtual void slotSlider1Change();
-  virtual void slotSlider2Change();
+    virtual void slotOpenFile();
+    virtual void slotExit();
+    virtual void slotSlider1Change();
+    virtual void slotSlider2Change();
 
 protected:
 
-  vtkSmartPointer<vtkRenderer> ren1;
-  vtkSmartPointer<vtkVolume> volume;
+    void Initialize();
+    void SetVolumeProperty();
+    void UpdateWidget();
+
+    vtkSmartPointer<vtkRenderer> ren1;
+    vtkSmartPointer<vtkVolume> volume;
 
 protected slots:
 
 private:
 
-  int m_windowhigh;
-  int m_windowlow;
-  string m_filename;
+    int m_windowhigh;
+    int m_windowlow;
+    string m_filename;
 
-//  vtkSmartPointer<vtkQtTableView>         TableView;
+    //  vtkSmartPointer<vtkQtTableView>         TableView;
     
-  // Designer form
-  Ui_Viewer *ui;
+    // Designer form
+    Ui_Viewer *ui;
 
 
 };

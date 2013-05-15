@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.4.1, 2013-05-15T16:41:59. -->
+<!-- Written by Qt Creator 2.4.1, 2013-05-08T18:40:19. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -173,8 +173,8 @@
     </valuelist>
     <value type="int" key="CMakeProjectManager.BaseEnvironmentBase">2</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguation.Title">Viewer</value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
-    <value type="bool" key="CMakeProjectManager.CMakeRunConfiguration.UseTerminal">false</value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">-winodw &quot;4 100&quot; -input 00-P.mha</value>
+    <value type="bool" key="CMakeProjectManager.CMakeRunConfiguration.UseTerminal">true</value>
     <valuelist type="QVariantList" key="CMakeProjectManager.CMakeRunConfiguration.UserEnvironmentChanges"/>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Viewer</value>

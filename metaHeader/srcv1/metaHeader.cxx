@@ -1,62 +1,52 @@
-/* -----------------------------------------------------------------------
-   See COPYRIGHT.TXT and LICENSE.TXT for copyright and license information
-   ----------------------------------------------------------------------- */
-/* Print out the header info of the metafile */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
 
 
-#define BUFLEN 1024
-
-// void swap_short(unsigned char *pntr)
-// {
-    // unsigned char b0, b1;
-
-    // b0 = *pntr;
-    // b1 = *(pntr+1);
-        
-    // *pntr = b1;
-    // *(pntr+1) = b0;
-// }
 
 int main (int argc, char* argv[])
 {
-    FILE *fp1;
-    char *key[] = {"Comment", "ObjectType", "TransformType", "TransformMatrix",
+
+
+    string key[] = {"Comment", "ObjectType", "TransformType", "TransformMatrix",
     "BinaryData", "ElementByteOderMSB", "ElementDataByteOderMSB", "Color",
-    "Position", "AnatomicalOrientation", "ElementSpacing",
-	"HeaderSize", "Modality", "SequenceID", "ElementMin", "ElementMax", 
+    "Position", "AnatomicalOrientation", "ElementSpacing","HeaderSize",
+    "Modality", "SequenceID", "ElementMin", "ElementMax",
 	"ElementNumberOfChannels", "ElementSize", "ElementType", "ElementDataFile",
     "Offset", "CenterOfRotation", "CompressedData", "DimSize"};
 
     int i,j;
-    char buf[1024];
 
     if (argc != 2) {
-        printf ("Usage: %s infile\n", argv[0]);
-        exit (1);
+        cout<<"Usage:"<<argv[0]<<"infile"<<endl;
+        return -1;
     }
-    if (!(fp1 = fopen(argv[1],"rb"))) {
-        printf ("Error opening file \"%s\" for read\n", argv[1]);
-        exit (1);
+
+    ifstream file;
+    file.open(argv[1],ios::in);
+    if (!file) {
+        cout<<"Error opening file"<<argv[1]<<"for read"<<endl;
+        return -1;
     }
+
 
 	// 30 lines of MHA should have passed the header 
-    for (i=0; i<30; i++) { 
+    string line;
+    for (i=0; i<30; i++) {
         //read one line from fp1 to buf
-		if (fgets(buf,1024,fp1) == NULL) {
-            printf ("File error.\n");
-            exit (1);
-        }
+        getline(file,line,'\n');
 
         for(j=0; j<(sizeof(key)/sizeof(char*)); j++) {
-            if(strstr(buf, key[j])!=NULL) {
-                printf(buf);
+            if(line.find(string(key[j]))!=string::npos) {
+                cout<<line<<endl;
             }
 
         }
-    }
+
+        }
+
 //        if (strstr(buf, "DimSize")!=NULL) {
 ////            sscanf(&(buf[9]), "%d%d%d", &nx, &ny, &nz);
 
@@ -92,7 +82,6 @@ int main (int argc, char* argv[])
 //        fread(&c,1,1,fp1);
 //    }
 
-    fclose(fp1);
-//    fclose(fp2);
-    return 0;
+    file.close();
+
 }

@@ -192,7 +192,7 @@ void Viewer::Initialize()
     volume = vtkVolume::New();
     volume->SetMapper( volumeMapper ) ;
 
-    SetVolumeProperty();
+//    SetVolumeProperty();
 }
 
 
