@@ -9,8 +9,8 @@
 #include <QApplication>
 //#include <QCleanlooksStyle>
 
-#include "panelViewer.h"
-//#include "argumentsParse.h"
+#include "Viewer.h"
+#include "argumentsParse.h"
 
 extern int qInitResources_icons();
 
@@ -18,6 +18,24 @@ extern int qInitResources_icons();
 int main( int argc, char** argv )
 {
 
+
+//    vector<int> window;
+//    int windowhigh, windowlow;
+//    string filename;
+
+//    const char *help[] = {
+//        "Usage: render a 3D image, double click to open"
+//    };
+
+//    ArgumentParser ap;
+//    ap.SetCommandLineArg(argc, argv, help);
+////    ap.MarkAsRequired("-window");
+////    ap.MarkAsRequired("-input");
+//    if (!ap.IsRequiredFound()) { exit(1); }
+//    window = ap.MultiParse<int>("-window", "isnum");
+//    windowlow = window[0];
+//    windowhigh = window[1];
+//    filename = ap.OneParse("-input");
 
     // QT Stuff
     QApplication app( argc, argv );
