@@ -17,9 +17,9 @@
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>60</x>
       <y>190</y>
-      <width>71</width>
+      <width>91</width>
       <height>21</height>
      </rect>
     </property>
@@ -129,6 +129,32 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>300</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="ctkVTKMagnifyView" name="VTKMagnify">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>50</y>
+      <width>81</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="observeRenderWindowEvents">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -179,6 +205,16 @@
   </action>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>ctkVTKMagnifyView</class>
+   <extends>ctkCrosshairLabel</extends>
+   <header>ctkVTKMagnifyView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ctkCrosshairLabel</class>
+   <extends>QLabel</extends>
+   <header>ctkCrosshairLabel.h</header>
+  </customwidget>
   <customwidget>
    <class>QVTKWidget</class>
    <extends>QWidget</extends>
