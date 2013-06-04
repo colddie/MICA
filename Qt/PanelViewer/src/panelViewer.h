@@ -89,6 +89,7 @@ protected:
     void UpdateWidget();
     void AddCrosshair();
     void RedrawCrosshair();
+    void GetIntensity();
 
 protected slots:
 
@@ -111,7 +112,8 @@ private:
     //
     QList<unsigned int> imageDimension;
     QList<double> imageSpacing;
-    QList<int> currentPosition;
+    QVector<unsigned int> currentSlice;
+    QVector<double> currentPosition;
     QString currentWidget;
     QList<vtkSmartPointer<vtkLineSource> > horizontalLine;
     QList<vtkSmartPointer<vtkLineSource> > verticalLine;

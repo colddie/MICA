@@ -70,6 +70,7 @@ Viewer::Viewer(QMainWindow *parent)
 
     //
     loadImage = false;
+    currentSlice.reserve(3);
     currentPosition.reserve(3);
     imageDimension.reserve(3);
     imageSpacing.reserve(3);
@@ -375,7 +376,7 @@ void Viewer::LoadVolume(std::string filename)
     //  Filp y axis, need to find a better way
     //    this->viewerAxial->GetRenderer()->GetActiveCamera()->SetRoll(180);
     //    this->viewerAxial->GetRenderer()->GetActiveCamera()->SetViewUp(0,-1,0);
-    this->viewerAxial->SetSlice(1);
+    this->viewerAxial->SetSlice(0);
     this->viewerAxial->Render();
 
 
@@ -393,7 +394,7 @@ void Viewer::LoadVolume(std::string filename)
     //    this->ui->qvtkWidget_1->GetInteractor()->Start();
     //    this->viewerAxial->SetRenderer(render1);
     this->viewerCoronal->GetRenderer()->ResetCamera();
-    this->viewerCoronal->SetSlice(1);
+    this->viewerCoronal->SetSlice(0);
     this->viewerCoronal->Render();
 
 
@@ -415,7 +416,7 @@ void Viewer::LoadVolume(std::string filename)
 
     //    this->viewerAxial->SetRenderer(render1);
     this->viewerSagittal->GetRenderer()->ResetCamera();
-    this->viewerSagittal->SetSlice(1);
+    this->viewerSagittal->SetSlice(0);
     this->viewerSagittal->Render();
 
     AddCrosshair();
@@ -500,38 +501,79 @@ void Viewer::RedrawCrosshair()
     //
     int xWidth = imageDimension[0]/2*imageSpacing[0];
     int yHeight = imageDimension[1]/2*imageSpacing[1];
-    int zSlice = imageDimension[2];
+    int zSlice = imageDimension[2]*imageSpacing[2];
 
     /* Use the Z-range of of the original image to tell help tell us where to place the line.
         *  We need to direction of projection so that we always place the line infront of the original image
         *  from the camera's perspective
         */
-    horizontalLine[0]->SetPoint1(-xWidth,currentPosition[1]-yHeight,0);
-    horizontalLine[0]->SetPoint2(xWidth,currentPosition[1]-yHeight,0);
+    horizontalLine[0]->SetPoint1(-xWidth,currentPosition[1],0);
+    horizontalLine[0]->SetPoint2(xWidth,currentPosition[1],0);
     horizontalLineActor[0]->GetProperty()->SetOpacity(0.5);
     horizontalLine[0]->Update();
-    verticalLine[0]->SetPoint1(xWidth-currentPosition[0],-yHeight,0);
-    verticalLine[0]->SetPoint2(xWidth-currentPosition[0],yHeight,0);
+    verticalLine[0]->SetPoint1(currentPosition[0],-yHeight,0);
+    verticalLine[0]->SetPoint2(currentPosition[0],yHeight,0);
     verticalLineActor[0]->GetProperty()->SetOpacity(0.5);
     verticalLine[0]->Update();
 
-    horizontalLine[1]->SetPoint1(-xWidth,-1000,(currentPosition[2]-zSlice)*imageSpacing[2]);
-    horizontalLine[1]->SetPoint2(xWidth,-1000,(currentPosition[2]-zSlice)*imageSpacing[2]);
+    horizontalLine[1]->SetPoint1(-xWidth,-1000,currentPosition[2]);
+    horizontalLine[1]->SetPoint2(xWidth,-1000,currentPosition[2]);
     horizontalLineActor[1]->GetProperty()->SetOpacity(0.5);
     horizontalLine[1]->Update();
-    verticalLine[1]->SetPoint1(xWidth-currentPosition[0],-1000,-zSlice*imageSpacing[2]);  // -1000 to put line in front
-    verticalLine[1]->SetPoint2(xWidth-currentPosition[0],-1000,0);
+    verticalLine[1]->SetPoint1(currentPosition[0],-1000,-zSlice);  // -1000 to put line in front
+    verticalLine[1]->SetPoint2(currentPosition[0],-1000,0);
     verticalLineActor[1]->GetProperty()->SetOpacity(0.5);
     verticalLine[1]->Update();
 
-    horizontalLine[2]->SetPoint1(1000,-yHeight,(currentPosition[2]-zSlice)*imageSpacing[2]); // 1000 to put line in front
-    horizontalLine[2]->SetPoint2(1000,yHeight,(currentPosition[2]-zSlice)*imageSpacing[2]);
+    horizontalLine[2]->SetPoint1(1000,-yHeight,currentPosition[2]); // 1000 to put line in front
+    horizontalLine[2]->SetPoint2(1000,yHeight,currentPosition[2]);
     horizontalLineActor[2]->GetProperty()->SetOpacity(0.5);
     horizontalLine[2]->Update();
-    verticalLine[2]->SetPoint1(1000,currentPosition[1]-yHeight,-zSlice*imageSpacing[2]);
-    verticalLine[2]->SetPoint2(1000,currentPosition[1]-yHeight,0);
+    verticalLine[2]->SetPoint1(1000,currentPosition[1],-zSlice);
+    verticalLine[2]->SetPoint2(1000,currentPosition[1],0);
     verticalLineActor[2]->GetProperty()->SetOpacity(0.5);
     verticalLine[2]->Update();
+
+
+}
+
+
+void Viewer::GetIntensity()
+{
+
+    int Type = this->viewerAxial->GetInput()->GetScalarType();
+    switch (Type) {
+    case 0:
+        std::cout<<"hello";
+        break;
+
+
+
+
+
+
+
+
+
+    }
+    std::cout<<currentSlice[0]<<" "<<currentSlice[1]<<" "<<currentSlice[2]<<" "<<std::endl;
+    std::cout<<currentPosition[0]<<" "<<currentPosition[1]<<" "<<currentPosition[2]<<" "<<std::endl;
+
+    short *intensity = (short *)this->viewerAxial->GetInput()->
+            GetScalarPointer(currentSlice[0],currentSlice[1],currentSlice[2]);
+
+//    std::cout<<intensity[currentSlice[2]*imageDimension[0]*imageDimension[1]+
+//               currentSlice[1]*imageDimension[0]+currentSlice[0]]
+//            <<std::endl;
+
+    std::cout<<vtkVariant(intensity[0]).ToString()<<std::endl;
+//    vtkIdType id = this->viewerAxial->GetInput()->FindPoint(currentSlice[0],
+//                                         currentSlice[1],currentSlice[2]);
+//    std::cout<<id<<std::endl;
+
+
+
+
 
 
 }
@@ -631,18 +673,30 @@ void Viewer::mouseMoveCallback(vtkObject * obj, unsigned long,
     //               this->ui->verticalSlider_1->value());
     //    this->ui->label->setText(str);
 
+    double pos[3];
+    int axis;
     VTK_CREATE(vtkCellPicker, picker);
+
     // pick on this pixel
     if (currentWidget == "qvtkWidget_1") {
     picker->Pick(event_pos[0],event_pos[1],0,this->viewerAxial->GetRenderer());
 
     //check positoin in image
     if(picker->GetCellId() != -1) {
+        picker->GetPickPosition(pos);
+        currentPosition[0] = pos[0];
+        currentPosition[1] = pos[1];
+        currentPosition[2] = pos[2];
+
         QString str;
         str.sprintf("x=%d  y=%d  z=%d", picker->GetCellIJK()[0]+1,
-                    picker->GetCellIJK()[1]+1, this->ui->verticalSlider_1->value()+1);
-
+        picker->GetCellIJK()[1]+1, this->viewerAxial->GetSlice()+1);
         this->ui->label->setText(str);
+        currentSlice[0] = picker->GetCellIJK()[0]+1;
+        currentSlice[1] = picker->GetCellIJK()[1]+1;
+        currentSlice[2] = picker->GetCellIJK()[2]+1;
+
+        GetIntensity();
     }
     }
     if (currentWidget == "qvtkWidget_2") {
@@ -650,10 +704,19 @@ void Viewer::mouseMoveCallback(vtkObject * obj, unsigned long,
 
     //check positoin in image
     if(picker->GetCellId() != -1) {
+        picker->GetPickPosition(pos);
+        currentPosition[0] = pos[0];
+        currentPosition[1] = pos[1];
+        currentPosition[2] = pos[2];
         QString str;
         str.sprintf("x=%d  y=%d  z=%d", picker->GetCellIJK()[0]+1,
-                    this->ui->verticalSlider_2->value()+1, picker->GetCellIJK()[2]+1);
+                    this->viewerCoronal->GetSlice()+1, picker->GetCellIJK()[2]+1);
         this->ui->label->setText(str);
+        currentSlice[0] = picker->GetCellIJK()[0]+1;
+        currentSlice[1] = picker->GetCellIJK()[1]+1;
+        currentSlice[2] = picker->GetCellIJK()[2]+1;
+
+        GetIntensity();
     }
     }
     if (currentWidget == "qvtkWidget_3") {
@@ -661,13 +724,27 @@ void Viewer::mouseMoveCallback(vtkObject * obj, unsigned long,
 
     //check positoin in image
     if(picker->GetCellId() != -1) {
+        picker->GetPickPosition(pos);
+        currentPosition[0] = pos[0];
+        currentPosition[1] = pos[1];
+        currentPosition[2] = pos[2];
         QString str;
-        str.sprintf("x=%d  y=%d  z=%d", this->ui->verticalSlider_3->value()+1,
+        str.sprintf("x=%d  y=%d  z=%d", this->viewerSagittal->GetSlice()+1,
                     picker->GetCellIJK()[1]+1, picker->GetCellIJK()[2]+1);
         this->ui->label->setText(str);
+        currentSlice[0] = picker->GetCellIJK()[0]+1;
+        currentSlice[1] = picker->GetCellIJK()[1]+1;
+        currentSlice[2] = picker->GetCellIJK()[2]+1;
+
+        GetIntensity();
     }
     }
+
+
     }
+
+
+
 }
 
 
@@ -681,59 +758,58 @@ void Viewer::mouseClickCallback(vtkObject * obj, unsigned long,
     // get interactor
     iren = vtkRenderWindowInteractor::SafeDownCast(obj);
 
-    // get event position
-    int event_pos[2], iren_size[2];
-    iren->GetEventPosition(event_pos);
+//    // get event position
+//    int event_pos[2], iren_size[2];
+//    iren->GetEventPosition(event_pos);
 
-    // pick on this pixel
-    VTK_CREATE(vtkCellPicker, picker);
+//    // pick on this pixel
+//    VTK_CREATE(vtkCellPicker, picker);
 
-    if (currentWidget == "qvtkWidget_1") {
-        picker->Pick(event_pos[0],event_pos[1],0,this->viewerAxial->GetRenderer());
-        //check positoin in image
-        if(picker->GetCellId() != -1) {
-            //            QString str;
-            //            str.sprintf("x=%d  y=%d  z=%d", imageWidth-1-picker->GetCellIJK()[0]+1,
-            //                        picker->GetCellIJK()[1]+1, picker->GetCellIJK()[2]+1);
-            //            this->ui->label->setText(str);
-            currentPosition[0]=imageDimension[0]-1-picker->GetCellIJK()[0]-1;
-            currentPosition[1]=picker->GetCellIJK()[1]+1;            
-        }
-    }
-    if (currentWidget == "qvtkWidget_2") {
-        picker->Pick(event_pos[0],event_pos[1],0,this->viewerCoronal->GetRenderer());
+//    if (currentWidget == "qvtkWidget_1") {
+//        picker->Pick(event_pos[0],event_pos[1],0,this->viewerAxial->GetRenderer());
+//        //check positoin in image
+//        if(picker->GetCellId() != -1) {
+//            //            QString str;
+//            //            str.sprintf("x=%d  y=%d  z=%d", imageWidth-1-picker->GetCellIJK()[0]+1,
+//            //                        picker->GetCellIJK()[1]+1, picker->GetCellIJK()[2]+1);
+//            //            this->ui->label->setText(str);
 
-        //check positoin in image
-        if(picker->GetCellId() != -1) {
-            //            QString str;
-            //            str.sprintf("x=%d  y=%d  z=%d", picker->GetCellIJK()[0]+1,
-            //                        picker->GetCellIJK()[1]+1, picker->GetCellIJK()[2]+1);
-            //            this->ui->label->setText(str);
-            currentPosition[0]=imageDimension[0]-1-picker->GetCellIJK()[0]-1;
-            currentPosition[2]=picker->GetCellIJK()[2]+1;
-        }
-    }
 
-    if (currentWidget == "qvtkWidget_3") {
-        picker->Pick(event_pos[0],event_pos[1],0,this->viewerSagittal->GetRenderer());
+//        }
+//    }
+//    if (currentWidget == "qvtkWidget_2") {
+//        picker->Pick(event_pos[0],event_pos[1],0,this->viewerCoronal->GetRenderer());
 
-        //check positoin in image
-        if(picker->GetCellId() != -1) {
-            //            QString str;
-            //            str.sprintf("x=%d  y=%d  z=%d", picker->GetCellIJK()[0]+1,
-            //                        picker->GetCellIJK()[1]+1, picker->GetCellIJK()[2]+1);
-            //            this->ui->label->setText(str);
-            currentPosition[1]=picker->GetCellIJK()[1]+1;
-            currentPosition[2]=picker->GetCellIJK()[2]+1;
-        }
-    }
+//        //check positoin in image
+//        if(picker->GetCellId() != -1) {
+//            //            QString str;
+//            //            str.sprintf("x=%d  y=%d  z=%d", picker->GetCellIJK()[0]+1,
+//            //                        picker->GetCellIJK()[1]+1, picker->GetCellIJK()[2]+1);
+//            //            this->ui->label->setText(str);
 
-    this->ui->verticalSlider_1->setValue(currentPosition[2]);
-    this->ui->verticalSlider_2->setValue(currentPosition[1]);
-    this->ui->verticalSlider_3->setValue(currentPosition[0]);
-    this->viewerAxial->SetSlice(currentPosition[2]);
-    this->viewerCoronal->SetSlice(currentPosition[1]);
-    this->viewerSagittal->SetSlice(currentPosition[0]);
+//        }
+//    }
+
+//    if (currentWidget == "qvtkWidget_3") {
+//        picker->Pick(event_pos[0],event_pos[1],0,this->viewerSagittal->GetRenderer());
+
+//        //check positoin in image
+//        if(picker->GetCellId() != -1) {
+//            //            QString str;
+//            //            str.sprintf("x=%d  y=%d  z=%d", picker->GetCellIJK()[0]+1,
+//            //                        picker->GetCellIJK()[1]+1, picker->GetCellIJK()[2]+1);
+//            //            this->ui->label->setText(str);
+
+//        }
+//    }
+
+    this->ui->verticalSlider_1->setValue(currentSlice[2]);
+    this->ui->verticalSlider_2->setValue(currentSlice[1]);
+    this->ui->verticalSlider_3->setValue(currentSlice[0]);
+    this->viewerAxial->SetSlice(currentSlice[2]);
+    this->viewerCoronal->SetSlice(currentSlice[1]);
+    this->viewerSagittal->SetSlice(currentSlice[0]);
+
     RedrawCrosshair();
     UpdateWidget();
     }
@@ -796,19 +872,19 @@ void Viewer::mouseClickCallback(vtkObject * obj, unsigned long,
          int slice = slider->value();
          if(!QString::compare(slider->objectName(),"verticalSlider_1")) {
              this->viewerAxial->SetSlice(slice);
-             currentPosition[2] = slice;
+             currentSlice[2] = slice;
              UpdateWidget(); qDebug() << slice << "z";
          }
 
          else if(!QString::compare(slider->objectName(),"verticalSlider_2")) {
              this->viewerCoronal->SetSlice(slice);
-             currentPosition[1] = slice;
+             currentSlice[1] = slice;
              UpdateWidget(); qDebug() << slice << "y";
          }
 
          else if(!QString::compare(slider->objectName(),"verticalSlider_3")) {
              this->viewerSagittal->SetSlice(slice);
-             currentPosition[0] = slice;
+             currentSlice[0] = slice;
              UpdateWidget(); qDebug() << slice << "x";
          }
          else
