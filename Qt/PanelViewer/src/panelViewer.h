@@ -15,7 +15,7 @@
 #ifndef _PanelViewer_H
 #define _PanelViewer_H
 
-#include "vtkSmartPointer.h"    // Required for smart pointer internal ivars.
+#include "vtkSmartPointer.h"    // Required for smart pointer internal vars.
 #include "QVTKInteractor.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkInteractorStyleTrackballCamera.h"

@@ -27,9 +27,9 @@ int main( int argc, char** argv )
     qInitResources_icons();
 
 //    Viewer mySimpleView(windowhigh, windowlow, filename);
-    Viewer mySimpleView;
+    Viewer *mySimpleView = new Viewer();
 //    mySimpleView.Run();
-    mySimpleView.show();
+    mySimpleView->show();
 
     return app.exec();
 }
