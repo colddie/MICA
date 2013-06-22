@@ -15,6 +15,7 @@
 #ifndef _DicomTags_H
 #define _DicomTags_H
 
+#include "itkImageSeriesReader.h"
 #include "itkMetaDataDictionary.h"
 
 #include <QMainWindow>
@@ -43,15 +44,17 @@ public:
     ~Viewer();
 
     void ReadDicom(const std::string dir);
+    void DisplayTag();
 
 signals:
 
 
 public slots:
-    virtual void slotOpen();
+    virtual void slotOpenFile();
     virtual void slotChangeTag(const QModelIndex &topLeft,
                                const QModelIndex &bottomRight);
     virtual void slotApplyChange();
+    virtual void slotGetCurrentFile(const QModelIndex &fileIndex);
 protected:
 
 
@@ -63,8 +66,13 @@ private:
     QSqlTableModel *model;
     QMap<QString, QString> toChange;
 
+    typedef signed short PixelType;
+    typedef itk::Image<PixelType, 3> ImageType;
+    typedef itk::ImageSeriesReader<ImageType> ReaderType;
+    ReaderType::Pointer reader;
+
     typedef itk::MetaDataDictionary DictionaryType;
-    DictionaryType dictionary;
+    DictionaryType m_dictionary;
 };
 
 

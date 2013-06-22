@@ -2,8 +2,8 @@
 #include "dicomTags.h"
 #include "connection.h"
 #include "tempSql.h"
+#include "tools.h"
 
-#include "itkImageSeriesReader.h"
 #include "itkGDCMImageIO.h"
 #include "itkGDCMSeriesFileNames.h"
 
@@ -16,8 +16,9 @@ Viewer::Viewer(QMainWindow *parent)
 
     this->ui->setupUi(this);
 
-    connect(this->ui->actionOpen,SIGNAL(triggered()),this,SLOT(slotOpen()));
+    connect(this->ui->actionOpen,SIGNAL(triggered()),this,SLOT(slotOpenFile()));
     connect(this->ui->actionApply_Change,SIGNAL(triggered()),this,SLOT(slotApplyChange()));
+    connect(this->ui->PathListWidget, SIGNAL(clicked(QModelIndex)),this,SLOT(slotGetCurrentFile(QModelIndex)));
 
     createConnection();
     //    model = new QStandardItemModel(this);
@@ -30,8 +31,8 @@ Viewer::Viewer(QMainWindow *parent)
     model->setHeaderData(1, Qt::Horizontal, QObject::tr("Name"));
     model->setHeaderData(2, Qt::Horizontal, QObject::tr("Value"));
     qDebug() << model->lastError().text();
-//    this->ui->tableView->setModel(model);
-//    this->ui->tableView->update();
+    //    this->ui->tableView->setModel(model);
+    //    this->ui->tableView->update();
 };
 
 
@@ -44,23 +45,21 @@ Viewer::~Viewer()
 
 
 
-
 }
 
 
 
 void Viewer::ReadDicom(const std::string dir)
 {
-    typedef signed short PixelType;
-    const unsigned int Dimension = 3;
-    typedef itk::Image<PixelType, Dimension> ImageType;
+    //    typedef signed short PixelType;
+    //    const unsigned int Dimension = 3;
+    //    typedef itk::Image<PixelType, Dimension> ImageType;
 
-    typedef itk::ImageSeriesReader<ImageType> ReaderType;
-    ReaderType::Pointer reader = ReaderType::New();
+    //    typedef itk::ImageSeriesReader<ImageType> ReaderType;
+    reader = ReaderType::New();
 
     typedef itk::GDCMImageIO ImageIOType;
     ImageIOType::Pointer dicomIO = ImageIOType::New();
-
     reader->SetImageIO(dicomIO);
 
     typedef itk::GDCMSeriesFileNames NamesGeneratorType;
@@ -72,27 +71,42 @@ void Viewer::ReadDicom(const std::string dir)
     reader->SetFileNames(fileNames);
     reader->Update();
 
+
+    //
+    QList<QString> list;
+    std::transform(fileNames.begin(),fileNames.end(),std::front_inserter(list),&QString::fromStdString);
+    this->ui->PathListWidget->addPaths(list);
+    this->ui->PathListWidget->update();
+
     //    typedef itk::MetaDataDictionary DictionaryType;
     //    const DictionaryType & dictionary = dicomIO->GetMetaDataDictionary();
-    dictionary = dicomIO->GetMetaDataDictionary();
+    ReaderType::DictionaryRawPointer dictionary;
+    ReaderType::DictionaryArrayType outputArray;
 
 
+    dictionary = (*(reader->GetMetaDataDictionaryArray()))[0];
+    m_dictionary = *(dictionary);
+
+}
+
+
+
+void Viewer::DisplayTag()
+{
     typedef itk::MetaDataObject<std::string> MetaDataStringType;
-    DictionaryType::ConstIterator itr = dictionary.Begin();
-    DictionaryType::ConstIterator end = dictionary.End();
+    //    typedef itk::MetaDataDictionary DictionaryType;
+    DictionaryType::ConstIterator itr = m_dictionary.Begin();
+    DictionaryType::ConstIterator end = m_dictionary.End();
 
 
-    DatabaseManager *manager;
+    DatabaseManager *manager = new DatabaseManager(this);
+    //    qDebug() << manager->TagID << manager->Name;
+
+
     if (!manager->openDB()) {
         qDebug() << "Failed to open dicom tags database!";
         exit(1);
     }
-
-    TagData *tagData;
-    tagData->TagId = "";
-    tagData->Name = "";
-//    manager->getTag(QString("0002,0000"), tagData);
-//    qDebug() << tagData->TagId <<" "<< tagData->Name;
 
 
     int rowNum;
@@ -116,13 +130,12 @@ void Viewer::ReadDicom(const std::string dir)
             model->setData(model->index(rowNum,0),QString::fromStdString(tagkey));
             model->setData(model->index(rowNum,2),QString::fromStdString(tagvalue));
 
-            if(!manager->getTag(QString::fromStdString(tagkey), tagData))
+            if(!manager->getTag(QString::fromStdString(tagkey)))
             {
                 qDebug() << "Failed to get tag!";
-                tagData->Name = "";
             }
-            qDebug() << tagData->TagId<< tagData->Name;
-            model->setData(model->index(rowNum,1),tagData->Name);
+            //            qDebug() << manager->TagID<< manager->Name;
+            model->setData(model->index(rowNum,1),manager->Name);
         }
 
 
@@ -135,31 +148,46 @@ void Viewer::ReadDicom(const std::string dir)
     this->ui->tableView->setModel(model);
     this->ui->tableView->update();
     connect(this->model,SIGNAL(dataChanged(QModelIndex,QModelIndex)),this,SLOT(slotChangeTag(QModelIndex,QModelIndex)));
+
 }
 
 
-
-
-
-void Viewer::slotOpen()
+void Viewer::slotOpenFile()
 {
     QFileDialog dirDialog(this);
     dirDialog.setFileMode(QFileDialog::Directory);
-//    QString filename = dirDialog.getOpenFileName(this,
-//        tr("Open Image"), QDir::currentPath(), tr("Image Files (*.mha *.jpg *.bmp)"));
+    //    QString filename = dirDialog.getOpenFileName(this,
+    //        tr("Open Image"), QDir::currentPath(), tr("Image Files (*.mha *.jpg *.bmp)"));
     QString fileName = dirDialog.getExistingDirectory(this,tr("Open Directory"),QDir::currentPath());
     qDebug() << fileName;
     ReadDicom(fileName.toStdString());
+    DisplayTag();
 
 
 }
+
+
+
+void Viewer::slotGetCurrentFile(const QModelIndex &fileIndex)
+{
+    qDebug() << fileIndex.row() << fileIndex.column();
+
+    m_dictionary = *((*(reader->GetMetaDataDictionaryArray()))[fileIndex.row()]);
+
+    // empty the model
+    model->removeRows(0,model->rowCount());
+    model->submitAll();
+    DisplayTag();
+
+}
+
 
 
 void Viewer::slotChangeTag(const QModelIndex &topLeft,const QModelIndex &bottomRight)
 {
-//    qDebug() << topLeft << bottomRight;
-//    qDebug() << model->data(topLeft,Qt::DisplayRole).toString();
-//    qDebug() << model->data(model->index(topLeft.row(),topLeft.column()-1),Qt::DisplayRole).toString();
+    //    qDebug() << topLeft << bottomRight;
+    //    qDebug() << model->data(topLeft,Qt::DisplayRole).toString();
+    //    qDebug() << model->data(model->index(topLeft.row(),topLeft.column()-1),Qt::DisplayRole).toString();
 
     QString key = model->data(topLeft,Qt::DisplayRole).toString();
     QString value = model->data(model->index(topLeft.row(),topLeft.column()-1),Qt::DisplayRole).toString();
@@ -177,12 +205,8 @@ void Viewer::slotApplyChange()
         qDebug() << i.key() << i.value();
         std::string entryID = QString(i.key()).toLocal8Bit().constData();
         std::string IDvalue = QString(i.value()).toLocal8Bit().constData();
-        itk::EncapsulateMetaData(dictionary, entryID, IDvalue);
+        //        itk::EncapsulateMetaData(dictionary, entryID, IDvalue);
         ++i;
     }
-
-
-
-
 
 }

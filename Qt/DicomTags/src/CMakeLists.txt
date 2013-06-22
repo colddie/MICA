@@ -108,7 +108,7 @@ INCLUDE_DIRECTORIES(
 # Set your files and resources here  
 SET(DicomSrcs main.cxx dicomTags.cxx tempSql.cxx)
 SET(DicomUI dicomTags.ui)
-SET(DicomHeaders dicomTags.h tempSql.h connection.h)
+SET(DicomHeaders dicomTags.h tempSql.h connection.h tools.h)
 #SET(Resources Icons/icons.qrc)
 
 QT4_WRAP_UI(UISrcs dicomTags.ui)

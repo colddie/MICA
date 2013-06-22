@@ -37,9 +37,10 @@
      </property>
      <widget class="ctkPathListWidget" name="PathListWidget">
       <property name="paths">
-       <stringlist>
-        <string>C:/</string>
-       </stringlist>
+       <stringlist/>
+      </property>
+      <property name="directoryOptions">
+       <set>ctkPathListWidget::Exists|ctkPathListWidget::Readable</set>
       </property>
      </widget>
      <widget class="QTableView" name="tableView"/>

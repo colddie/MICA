@@ -7,7 +7,7 @@
 #include <QDir>
 #include <QDebug>
 
-bool DatabaseManager::getTag(QString str, TagData*& data)
+bool DatabaseManager::getTag(QString str)
     {
     bool ret = false;
 
@@ -25,9 +25,9 @@ bool DatabaseManager::getTag(QString str, TagData*& data)
 
     while (query.next())
     {
-        data->TagId = query.value(0).toString();
-        data->Name = query.value(1).toString();
-        //        qDebug() << data->TagId << data->Name;
+        this->TagID = query.value(0).toString();
+        this->Name = query.value(1).toString();
+        qDebug() << this->TagID << this->Name;
         ret = true;
     }
 

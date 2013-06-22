@@ -6,27 +6,37 @@
 #include <QSqlDatabase>
 
 
-class TagData
-    {
-    public:
-        QString TagId;
-        QString Name;
-    };
+//class TagData
+//{
+
+//public:
+//    TagData();
+//    ~TagData();
+
+//    QString TagID;
+//    QString Name;
+
+//};
+
 
 
 class DatabaseManager : public QObject
-    {
-    public:
-        DatabaseManager(QObject *parent = 0);
-        ~DatabaseManager();
+{
+public:
+    DatabaseManager(QObject *parent = 0) : TagID(""), Name("")
+    {};
+    ~DatabaseManager(){};
 
-    public:
-        bool openDB();
-        bool getTag(QString str, TagData *& data);
+public:
+    bool openDB();
+    bool getTag(QString str);
 
-    private:
-//        QSqlDatabase db;
-    };
+    QString TagID;
+    QString Name;
+
+private:
+    //        QSqlDatabase db;
+};
 
 
 
