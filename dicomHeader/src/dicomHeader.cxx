@@ -1,0 +1,127 @@
+#include "dicomHeader.h"
+
+#include "itkImageSeriesWriter.h"
+
+
+// IOFactory already support multi format, add here to enable multi type
+// see IO_type class
+
+using namespace std;
+
+
+
+void itk::DicomHeader::ReadDicom(const std::string inputdicom)
+{
+
+    m_reader = ReaderType::New();
+    m_dicomIO = ImageIOType::New();
+    m_reader->SetImageIO(m_dicomIO);
+
+    m_nameGenerator = NamesGeneratorType::New();
+    m_nameGenerator->SetInputDirectory(inputdicom);
+
+    m_reader->SetFileNames(m_nameGenerator->GetInputFileNames());
+    m_reader->Update();
+
+}
+
+
+
+void itk::DicomHeader::PrintHeader(const unsigned int slidenum)
+{
+    m_dictionary = (*(m_reader->GetMetaDataDictionaryArray()))[slidenum];
+
+    typedef itk::MetaDataDictionary DictionaryType;
+    DictionaryType dictionary;
+    dictionary = *(m_dictionary);
+    typedef itk::MetaDataObject<std::string> MetaDataStringType;
+
+    DictionaryType::ConstIterator itr = dictionary.Begin();
+    DictionaryType::ConstIterator end = dictionary.End();
+
+    while (itr != end)
+    {
+
+        itk::MetaDataObjectBase::Pointer entry = itr->second;
+
+        MetaDataStringType::Pointer entryvalue =
+                dynamic_cast<MetaDataStringType *>(entry.GetPointer());
+
+        if (entryvalue)
+        {
+            std::string tagkey = itr->first;
+            std::string tagvalue = entryvalue->GetMetaDataObjectValue();
+            std::cout << tagkey << " = " << tagvalue << std::endl;
+
+        }
+
+        ++itr;
+    }
+
+}
+
+
+void itk::DicomHeader::ModifyHeader(const string tagid, const string tagvalue)
+{
+    unsigned int nbSlices = m_nameGenerator->GetInputFileNames().size();
+
+    for (unsigned int i=0; i<nbSlices; i++) {
+        m_dictionary = (*(m_reader->GetMetaDataDictionaryArray()))[i];
+        itk::EncapsulateMetaData<std::string>(*m_dictionary, tagid, tagvalue);
+        m_outputArray.push_back(m_dictionary);
+    }
+
+}
+
+
+void itk::DicomHeader::WriteDicom(const string outputdicom)
+{
+
+    typedef signed short    OutputPixelType;
+    const unsigned int      OutputDimension = 2;
+
+    typedef itk::Image< OutputPixelType, OutputDimension >    Image2DType;
+    typedef itk::ImageSeriesWriter<ImageType, Image2DType> WriterType;
+    WriterType::Pointer dicomWriter = WriterType::New();
+
+    dicomWriter->SetInput(m_reader->GetOutput());
+    dicomWriter->SetImageIO(m_dicomIO);
+    itksys::SystemTools::MakeDirectory( outputdicom.c_str() );
+    m_nameGenerator->SetOutputDirectory(outputdicom);
+    dicomWriter->SetFileNames(m_nameGenerator->GetOutputFileNames());
+
+    dicomWriter->SetMetaDataDictionaryArray(&m_outputArray);
+    dicomWriter->Update();
+
+
+
+
+
+    typedef itk::MetaDataDictionary DictionaryType;
+    DictionaryType dictionary;
+    dictionary = *(m_outputArray[0]);
+    typedef itk::MetaDataObject<std::string> MetaDataStringType;
+
+    DictionaryType::ConstIterator itr = dictionary.Begin();
+    DictionaryType::ConstIterator end = dictionary.End();
+
+    while (itr != end)
+    {
+
+        itk::MetaDataObjectBase::Pointer entry = itr->second;
+
+        MetaDataStringType::Pointer entryvalue =
+                dynamic_cast<MetaDataStringType *>(entry.GetPointer());
+
+        if (entryvalue)
+        {
+            std::string tagkey = itr->first;
+            std::string tagvalue = entryvalue->GetMetaDataObjectValue();
+            std::cout << tagkey << " = " << tagvalue << std::endl;
+
+        }
+
+        ++itr;
+    }
+
+}
