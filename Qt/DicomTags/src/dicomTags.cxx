@@ -75,6 +75,10 @@ void Viewer::ReadDicom(const std::string dir)
     //
     QList<QString> list;
     std::transform(fileNames.begin(),fileNames.end(),std::front_inserter(list),&QString::fromStdString);
+    QStringList paths = this->ui->PathListWidget->paths();
+    if (paths.size()!= 0) {
+        this->ui->PathListWidget->clear();
+    }
     this->ui->PathListWidget->addPaths(list);
     this->ui->PathListWidget->update();
 
@@ -160,6 +164,10 @@ void Viewer::slotOpenFile()
     //        tr("Open Image"), QDir::currentPath(), tr("Image Files (*.mha *.jpg *.bmp)"));
     QString fileName = dirDialog.getExistingDirectory(this,tr("Open Directory"),QDir::currentPath());
     qDebug() << fileName;
+    // empty the model
+    model->removeRows(0,model->rowCount());
+    model->submitAll();
+
     ReadDicom(fileName.toStdString());
     DisplayTag();
 
