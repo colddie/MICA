@@ -12,13 +12,12 @@ int main(int argc, char** argv)
 {
 
     const char *help[] = {
-        "Usage: dicomHeader -input inputDicom [-print] slideNumber [-header] dicomHasHeader"
+        "Usage: dicomHeader -input inputDicom [-print] slideNumber\n"
         "[-modify] [-add] [-delete] -tagID tagID -tagValue tagValue -output outputDicom\n"
         "Options:\n"
         "-input            Name of the dicom series\n"
-        "-output           Name of the dicom series\n"
+        "[-output]         Name of the dicom series\n"
         "[-print]          Slide number has the header to display\n"
-        "[-header]         Dicom series has the header to copy\n"
         "[-modify]         Tag to change\n"
         "[-add]            Tag to insert\n"
         "[-delete]         Tag to delete\n"
@@ -29,6 +28,7 @@ int main(int argc, char** argv)
     std::string inputdicom;
     std::string outputdicom;
     unsigned int slidenum;
+    bool isoutput;
     bool isprint;
     bool ismodify;
     bool isadd;
@@ -46,7 +46,9 @@ int main(int argc, char** argv)
     if (!ap.IsRequiredFound()) { exit(1); }
 
     inputdicom  = ap.OneParse("-input");
-    outputdicom = ap.OneParse("-output");
+    isoutput = ap.BoolParse("-output");
+    if (!isoutput) {
+        outputdicom = ap.OneParse("-output"); }
     isprint = ap.BoolParse("-print");
     if(!isprint) {
     slidenum = atoi(ap.OneParse("-print").c_str()); }
@@ -55,7 +57,7 @@ int main(int argc, char** argv)
     ismodify = ap.BoolParse("-modify");
     isadd = ap.BoolParse("-add");
     isdelete = ap.BoolParse("-delete");
-    if (ismodify||isadd||isdelete) {
+    if (!ismodify||!isadd||!isdelete) {
     tagid = ap.OneParse("-tagID");
     tagvalue = ap.OneParse("-tagValue");  }
 

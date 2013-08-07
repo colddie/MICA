@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.4.1, 2013-07-18T18:43:28. -->
+<!-- Written by Qt Creator 2.4.1, 2013-08-07T19:31:38. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -173,7 +173,8 @@
     </valuelist>
     <value type="int" key="CMakeProjectManager.BaseEnvironmentBase">2</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguation.Title">dicomHeader</value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">-input 2AVG -modify -tagID &quot;0040|0244&quot; -tagValue &quot;20110504&quot; -output 2AVGnew</value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">-input CACT -modify -output CACTnew -tagID &quot;0
+008|1030&quot; -tagValue &quot;CACT&quot;</value>
     <value type="bool" key="CMakeProjectManager.CMakeRunConfiguration.UseTerminal">true</value>
     <valuelist type="QVariantList" key="CMakeProjectManager.CMakeRunConfiguration.UserEnvironmentChanges"/>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
