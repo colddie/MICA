@@ -116,7 +116,7 @@ int main (int argc, char* argv[])
     file3.open(headerFilename.c_str());
     file3.flush();
 
-    file3 << "!INTERFILE := " << endl;
+    file3 << "!INTERFILE  := " << endl;
     file3 << "name of data file := " << outputPrefix << ".img " << endl;
     file3 << "!GENERAL DATA :=  " << endl;
     file3 << "!GENERAL IMAGE DATA := " << endl;
@@ -144,6 +144,7 @@ int main (int argc, char* argv[])
     file3 << "image scaling factor[1] := 1 " << endl;
     file3 << "data offset in bytes[1] := 0 " << endl;
     file3 << "quantification units := 1 " << endl;
+    file3 << "!END OF INTERFILE :=" <<endl;
 
 
 
