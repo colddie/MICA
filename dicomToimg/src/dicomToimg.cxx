@@ -11,7 +11,7 @@ int main (int argc, char* argv[])
 
     if (argc < 3) {
         std::cout << "Usage:" <<std::endl;
-        std::cout << argv[0] << "DicomDirectory outputMetaFile [seriesName]"
+        std::cout << argv[0] << " DicomDirectory outputMetaFile [seriesName]"
                   <<std::endl;
 
         return EXIT_FAILURE;

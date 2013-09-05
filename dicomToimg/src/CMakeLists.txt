@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
  
-project(dicomTomha)
+project(dicomToimg)
  
 if( NOT CMAKE_BUILD_TYPE )
 
@@ -24,5 +24,5 @@ include_directories (${COMMON_DIRECTORIES})
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 file (GLOB COMMON_DIRECTORIES "${COMMON_DIRECTORIES}/*.*")
 
-add_executable(dicomTomha dicomTomha.cxx ${COMMON_DIRECTORIES})
-target_link_libraries(dicomTomha ${ITK_LIBRARIES})
+add_executable(dicomToimg dicomToimg.cxx ${COMMON_DIRECTORIES})
+target_link_libraries(dicomToimg ${ITK_LIBRARIES})
