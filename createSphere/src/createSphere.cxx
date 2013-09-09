@@ -15,12 +15,12 @@ int main(int argc, char** argv)
         "Usage:  createSphere\n"
         "-output outputfile\n"
         "-sz     image dimension size\n"
-        "-c      center coordinate\n"
+        "-c      center coordinate (mm)\n"
         "-r      radius (mm)\n"
         "-pixel  pixel type, supported: (unsigned) char,  (unsigned) short, float, double\n"
         ""
         "Options:\n"
-        "-sp     image spacing\n"
+        "-sp     image spacing (mm)\n"
         "-dim    image dimension, default 3, supported: 2, 3"
     };
 
