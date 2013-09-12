@@ -51,9 +51,9 @@ int main(int argc, char** argv)
     if (!ap.BoolParse("-sp")) {
         imagespacing = ap.MultiParse <double>("-sp", "isnum");
     } else {
-        imagespacing.push_back(1);
-        imagespacing.push_back(1);
-        imagespacing.push_back(1);
+        for (unsigned int i = 0; i < dimension; i++) {
+            imagespacing.push_back(1);
+        }
     }
 
     ap.MarkAsRequired("-output");
