@@ -77,14 +77,14 @@ void Viewer::DisplayImage()
     vtkReader->Update();
 
 
-    VTK_CREATE(vtkImageFlip, flipper);
-    flipper->SetFilteredAxis(1);
-    flipper->SetInput(vtkReader->GetOutput());
-    flipper->Update();
+//    VTK_CREATE(vtkImageFlip, flipper);
+//    flipper->SetFilteredAxis(1);
+//    flipper->SetInput(vtkReader->GetOutput());
+//    flipper->Update();
 
     this->m_viewer2 = vtkSmartPointer<vtkImageViewer2>::New();
 
-    this->m_viewer2->SetInput(flipper->GetOutput());
+    this->m_viewer2->SetInput(vtkReader->GetOutput());
     this->m_viewer2->SetSliceOrientationToXY();
     this->m_viewer2->GetRenderer()->ResetCamera();
     this->m_viewer2->UpdateDisplayExtent();
@@ -136,7 +136,7 @@ void Viewer::Mainfunction()
 
     segmenter->SetInitialNeighborhoodRadius(3);
     segmenter->SetMultiplier(3);
-    segmenter->SetNumberOfIterations(25);
+    segmenter->SetNumberOfIterations(5);
     segmenter->SetReplaceValue(255);
 
 
@@ -292,22 +292,29 @@ void Viewer::mouseClickCallback(vtkObject * obj, unsigned long,
 //        }
 //    }
 
-    VTK_CREATE(vtkSphereSource, sphereSource);
-    sphereSource->SetCenter(pos[0], pos[1], pos[2]);
-    sphereSource->SetRadius(10.0);
+    //    VTK_CREATE(vtkSphereSource, sphereSource);
+    if (m_sphereSource == NULL)
+    {
+        std::cout<<"hello";
+        m_sphereSource = vtkSmartPointer<vtkSphereSource>::New();
+    }
+    m_sphereSource->SetCenter(pos[0], pos[1], pos[2]);
+    m_sphereSource->SetRadius(10.0);
 
     //Create a mapper and actor
     vtkSmartPointer<vtkPolyDataMapper> mapper =
             vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputConnection(sphereSource->GetOutputPort());
+    mapper->SetInputConnection(m_sphereSource->GetOutputPort());
 
-    vtkSmartPointer<vtkActor> actor =
-            vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
-    actor->GetProperty()->SetColor(0, 0, 1);
+//    vtkSmartPointer<vtkActor> actor =
+//            vtkSmartPointer<vtkActor>::New();
+    m_actor = vtkSmartPointer<vtkActor>::New();
+    m_actor->SetMapper(mapper);
+    m_actor->GetProperty()->SetColor(0, 0, 1);
 
     //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
-    this->m_viewer2->GetRenderer()->AddActor(actor);
+    this->m_viewer2->GetRenderer()->AddActor(m_actor);
     this->m_viewer2->Render();
+
 
 }

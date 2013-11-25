@@ -11,6 +11,8 @@ class vtkImageViewer2;
 class vtkObject;
 class vtkCommand;
 class vtkEventQtSlotConnect;
+class vtkSphereSource;
+class vtkActor;
 
 // Forward Qt class declarations
 //class Ui_Viewer;
@@ -43,6 +45,8 @@ private:
     Ui_Viewer *ui;
     vtkSmartPointer<vtkImageViewer2> m_viewer2;
     double m_index[3];
+    vtkSmartPointer<vtkSphereSource> m_sphereSource;
+    vtkSmartPointer<vtkActor> m_actor;
 
     // must declare as class member instead define in the function
     vtkSmartPointer<vtkEventQtSlotConnect> connection;
