@@ -77,15 +77,25 @@ void Viewer::DisplayImage()
     vtkReader->Update();
 
 
-//    VTK_CREATE(vtkImageFlip, flipper);
-//    flipper->SetFilteredAxis(1);
-//    flipper->SetInput(vtkReader->GetOutput());
-//    flipper->Update();
+    //    VTK_CREATE(vtkImageFlip, flipper);
+    //    flipper->SetFilteredAxis(1);
+    //    flipper->SetInput(vtkReader->GetOutput());
+    //    flipper->Update();
 
     this->m_viewer2 = vtkSmartPointer<vtkImageViewer2>::New();
 
     this->m_viewer2->SetInput(vtkReader->GetOutput());
     this->m_viewer2->SetSliceOrientationToXY();
+
+    // Fixed invert y axis
+    double pos[2], foc[2];
+    this->m_viewer2->GetRenderer()->GetActiveCamera()->GetPosition(pos);
+    this->m_viewer2->GetRenderer()->GetActiveCamera()->GetFocalPoint(foc);
+    pos[2] = -1;
+    this->m_viewer2->GetRenderer()->GetActiveCamera()->SetPosition(pos);
+    //    std::cout<<pos[0]<<pos[1]<<pos[2]<<std::endl<<foc[0]<<foc[1]<<foc[2]<<std::endl;
+
+    this->m_viewer2->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
     this->m_viewer2->GetRenderer()->ResetCamera();
     this->m_viewer2->UpdateDisplayExtent();
     this->m_viewer2->SetupInteractor(this->ui->qvtkWidget->GetInteractor());
@@ -295,7 +305,6 @@ void Viewer::mouseClickCallback(vtkObject * obj, unsigned long,
     //    VTK_CREATE(vtkSphereSource, sphereSource);
     if (m_sphereSource == NULL)
     {
-        std::cout<<"hello";
         m_sphereSource = vtkSmartPointer<vtkSphereSource>::New();
     }
     m_sphereSource->SetCenter(pos[0], pos[1], pos[2]);
