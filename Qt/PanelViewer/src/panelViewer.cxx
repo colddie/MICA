@@ -236,10 +236,10 @@ void Viewer::LoadVolume(std::string filename)
     reader->SetFileName(filename.c_str());
     reader->Update();
 
-    VTK_CREATE(vtkImageFlip, flipper);
-    flipper->SetFilteredAxis(1);
-    flipper->SetInput(reader->GetOutput());
-    flipper->Update();
+    //    VTK_CREATE(vtkImageFlip, flipper);
+    //    flipper->SetFilteredAxis(1);
+    //    flipper->SetInput(reader->GetOutput());
+    //    flipper->Update();
 
 
     // Slider
@@ -272,8 +272,18 @@ void Viewer::LoadVolume(std::string filename)
     //    this->ui->qvtkWidget_3->GetRenderWindow()->AddRenderer(render3);
 
     //  Declare vtk renderwindow
-    this->viewerAxial->SetInput(flipper->GetOutput());
+    this->viewerAxial->SetInput(reader->GetOutput());
     this->viewerAxial->SetSliceOrientationToXY();
+
+    // Fixed invert y axis
+    double pos[2], foc[2];
+    this->viewerAxial->GetRenderer()->GetActiveCamera()->GetPosition(pos);
+    this->viewerAxial->GetRenderer()->GetActiveCamera()->GetFocalPoint(foc);
+    pos[2] = -1;
+    this->viewerAxial->GetRenderer()->GetActiveCamera()->SetPosition(pos);
+    std::cout<<pos[0]<<pos[1]<<pos[2]<<std::endl<<foc[0]<<foc[1]<<foc[2]<<std::endl;
+
+    this->viewerAxial->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
     this->viewerAxial->GetRenderer()->ResetCamera();
     this->viewerAxial->UpdateDisplayExtent();
     this->viewerAxial->SetupInteractor(this->ui->qvtkWidget_1->GetInteractor());
@@ -296,8 +306,16 @@ void Viewer::LoadVolume(std::string filename)
 
 
     //
-    this->viewerCoronal->SetInput(flipper->GetOutput());
+    this->viewerCoronal->SetInput(reader->GetOutput());
     this->viewerCoronal->SetSliceOrientationToXZ();
+
+
+    this->viewerCoronal->GetRenderer()->GetActiveCamera()->GetPosition(pos);
+    this->viewerCoronal->GetRenderer()->GetActiveCamera()->GetFocalPoint(foc);
+
+    //    this->viewerCoronal->GetRenderer()->GetActiveCamera()->SetPosition(0,-1,0);
+    std::cout<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<std::endl<<foc[0]<<" "<<foc[1]<<" "<<foc[2]<<std::endl;
+
     this->viewerCoronal->GetRenderer()->ResetCamera();
     this->viewerCoronal->UpdateDisplayExtent();
     this->ui->qvtkWidget_2->SetRenderWindow(this->viewerCoronal->GetRenderWindow());
@@ -317,8 +335,16 @@ void Viewer::LoadVolume(std::string filename)
 
 
     //
-    this->viewerSagittal->SetInput(flipper->GetOutput());
+    this->viewerSagittal->SetInput(reader->GetOutput());
     this->viewerSagittal->SetSliceOrientationToYZ();
+
+    this->viewerSagittal->GetRenderer()->GetActiveCamera()->GetPosition(pos);
+    this->viewerSagittal->GetRenderer()->GetActiveCamera()->GetFocalPoint(foc);
+
+    pos[1] = 1;
+    this->viewerSagittal->GetRenderer()->GetActiveCamera()->SetPosition(pos);
+    std::cout<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<std::endl<<foc[0]<<" "<<foc[1]<<" "<<foc[2]<<std::endl;
+
     this->viewerSagittal->GetRenderer()->ResetCamera();
     this->viewerSagittal->UpdateDisplayExtent();
     this->ui->qvtkWidget_3->SetRenderWindow(this->viewerSagittal->GetRenderWindow());
@@ -444,6 +470,7 @@ void Viewer::UpdateWidget()
 //    this->ui->qvtkWidget_1->GetRenderWindow()->AddRenderer(this->viewerAxial->GetRenderer());
     this->ui->qvtkWidget_1->GetRenderWindow()->Render();
     this->ui->qvtkWidget_1->update();
+    this->viewerAxial->UpdateDisplayExtent();
 
 //    this->ui->qvtkWidget_2->GetRenderWindow()->AddRenderer(this->viewerCoronal->GetRenderer());
     this->ui->qvtkWidget_2->GetRenderWindow()->Render();
@@ -520,6 +547,17 @@ void Viewer::AddCrosshair()
         verticalLineActor[i]->GetProperty()->SetLineWidth(2.0);
         verticalLineActor[i]->GetProperty()->SetColor(1.0,1.0,0.0);
     }
+
+    // bring the actors to front
+    horizontalLineActor[0]->SetPosition(0, 0, -1000);
+    horizontalLineActor[2]->SetPosition(-2000, 0, 0);
+    verticalLineActor[0]->SetPosition(0, 0, -1000);
+    verticalLineActor[2]->SetPosition(-2000, 0 ,0);
+    //        double pos[2];
+    //        horizontalLineActor[2]->GetPosition(pos);
+    //        std::cout<<pos[0]<<pos[1]<<pos[2]<<std::endl;
+    //        verticalLineActor[2]->GetPosition(pos);
+    //        std::cout<<pos[0]<<pos[1]<<pos[2]<<std::endl;
 
 
     // Add to actors
@@ -724,12 +762,12 @@ void Viewer::mouseMoveCallback(vtkObject * obj, unsigned long,
         currentPosition[2] = pos[2];
 
         QString str;
-        str.sprintf("x=%d  y=%d  z=%d", picker->GetCellIJK()[0]+1,
-        picker->GetCellIJK()[1]+1, currentViewer->GetSlice()+1);
+        str.sprintf("x=%d  y=%d  z=%d", picker->GetCellIJK()[0],
+        picker->GetCellIJK()[1], currentViewer->GetSlice());
         this->ui->label->setText(str);
-        currentSlice[0] = picker->GetCellIJK()[0]+1;
-        currentSlice[1] = picker->GetCellIJK()[1]+1;
-        currentSlice[2] = picker->GetCellIJK()[2]+1;
+        currentSlice[0] = picker->GetCellIJK()[0];
+        currentSlice[1] = picker->GetCellIJK()[1];
+        currentSlice[2] = picker->GetCellIJK()[2];
 
         // get type first
         //#define 	VTK_CHAR   2
@@ -907,16 +945,20 @@ void Viewer::SetWindowLevel(int index)
         window = 256;
         break;
     case 1:  // abdomen
-        level = 40;
-        window = 400;
+        level = 50;
+        window = 350;
         break;
     case 2:  // brain
+        level = 40;
+        window = 80;
         break;
     case 3:  // extremities
         level = 0;
         window = 400;
         break;
     case 4:  // liver
+        level = 80;
+        window = 150;
         break;
     case 5:  // lung
         level = -300;
