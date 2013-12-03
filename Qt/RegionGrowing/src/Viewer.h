@@ -14,6 +14,8 @@ class vtkEventQtSlotConnect;
 class vtkSphereSource;
 class vtkActor;
 
+
+
 // Forward Qt class declarations
 //class Ui_Viewer;
 
@@ -39,6 +41,10 @@ protected:
 
     void DisplayImage();
 
+    template <typename T>
+    void GetIntensity(unsigned int slicex, unsigned int slicey, unsigned int slicez);
+
+
 private:
 
     std::string m_filename;
@@ -60,6 +66,12 @@ class MouseInteractorStyle : public vtkInteractorStyleTrackballCamera// Or vtkIn
   public:
     static MouseInteractorStyle* New();
     vtkTypeMacro(MouseInteractorStyle, vtkInteractorStyleTrackballCamera);
+
+
+    virtual void OnMouseMove()
+    {
+//        this->InteractionProp
+    }
 
     virtual void OnLeftButtonDown()
     {
@@ -97,6 +109,7 @@ class MouseInteractorStyle : public vtkInteractorStyleTrackballCamera// Or vtkIn
     }
 
 };
+
 
 
 #endif // VIEWER_H

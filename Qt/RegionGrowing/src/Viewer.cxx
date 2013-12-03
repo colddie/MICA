@@ -145,7 +145,7 @@ void Viewer::Mainfunction()
     SegmenterType::Pointer segmenter = SegmenterType::New();
 
     segmenter->SetInitialNeighborhoodRadius(3);
-    segmenter->SetMultiplier(3);
+    segmenter->SetMultiplier(3);  //the confidence interval is the mean plus or minus the "Multiplier" times the standard deviation
     segmenter->SetNumberOfIterations(5);
     segmenter->SetReplaceValue(255);
 
@@ -172,7 +172,16 @@ void Viewer::Mainfunction()
 }
 
 
+template <typename T>
+void Viewer::GetIntensity(unsigned int slicex,
+                          unsigned int slicey,
+                          unsigned int slicez)
+{
+    T *intensity = (T*)this->m_viewer2->GetInput()
+            ->GetScalarPointer(slicex, slicey, slicez);
 
+    this->ui->label_2->setText(QString(vtkVariant(intensity[0]).ToString()));
+}
 
 
 //
@@ -243,12 +252,29 @@ void Viewer::mouseMoveCallback(vtkObject * obj, unsigned long,
 
     //check positoin in image
     if(picker->GetCellId() != -1) {
-        //        picker->GetPickPosition(pos);
+
+        //  When the mouse is on the sphere, we need to display the last time value
+        //        if (this->m_interactorStyle->InteractionProp == this->m_actor)
+        if (picker->GetActor()!=NULL)
+        {
+            std::cout<<"mouse in the actor!"<<std::endl;
+            return;
+        }
 
         QString str;
         str.sprintf("%d  %d  %d", picker->GetCellIJK()[0]+1,
                     picker->GetCellIJK()[1]+1, m_viewer2->GetSlice()+1);
         this->ui->label->setText(str);
+
+        switch (this->m_viewer2->GetInput()->GetScalarType())
+        {
+        vtkTemplateMacro(GetIntensity<VTK_TT>(picker->GetCellIJK()[0],
+                                              picker->GetCellIJK()[1],
+                                              picker->GetCellIJK()[2]));
+
+        default:
+            return;
+        }
     }
 
 }
