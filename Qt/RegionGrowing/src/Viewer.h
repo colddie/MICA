@@ -32,6 +32,7 @@ public slots:
     void slotOpenFile();
     void slotExit();
     void changeSlice(int slice);
+    void updateValueDisplay(int val);
 
     void mouseMoveCallback(vtkObject*,ulong,void*,void*,vtkCommand*);
     void mouseClickCallback(vtkObject*,ulong,void*,void*,vtkCommand*);

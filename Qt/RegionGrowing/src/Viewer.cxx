@@ -50,12 +50,19 @@ Viewer::Viewer(QMainWindow *parent) :
 
     this->ui->setupUi(this);
 
+    this->ui->label_3->setText("Radius");
+    this->ui->label_4->setText("Confidence Interval");
+    this->ui->label_5->setText("Iterations");
+
+    this->ui->label_6->setText("3");
+    this->ui->label_7->setText("3");
 
     connect(this->ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotOpenFile()));
     connect(this->ui->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
     connect(this->ui->verticalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(changeSlice(int)));
     connect(this->ui->pushButton, SIGNAL(clicked()), this, SLOT(Mainfunction()));
-
+    connect(this->ui->horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(updateValueDisplay(int)));
+    connect(this->ui->horizontalScrollBar_2, SIGNAL(valueChanged(int)), this, SLOT(updateValueDisplay(int)));
 }
 
 
@@ -144,11 +151,15 @@ void Viewer::Mainfunction()
     typedef itk::ConfidenceConnectedImageFilter<ImageType, ImageType> SegmenterType;
     SegmenterType::Pointer segmenter = SegmenterType::New();
 
-    segmenter->SetInitialNeighborhoodRadius(3);
-    segmenter->SetMultiplier(3);  //the confidence interval is the mean plus or minus the "Multiplier" times the standard deviation
-    segmenter->SetNumberOfIterations(5);
-    segmenter->SetReplaceValue(255);
+//    segmenter->SetInitialNeighborhoodRadius(3);
+//    segmenter->SetMultiplier(3);  //the confidence interval is the mean plus or minus the "Multiplier" times the standard deviation
+//    segmenter->SetNumberOfIterations(5);
+//    segmenter->SetReplaceValue(255);
 
+    segmenter->SetInitialNeighborhoodRadius(this->ui->horizontalScrollBar->value());
+    segmenter->SetMultiplier(this->ui->horizontalScrollBar_2->value());
+    segmenter->SetNumberOfIterations(this->ui->spinBox->value());
+    segmenter->SetReplaceValue(255);
 
     //  Set Seed
     ImageType::IndexType seed;
@@ -233,7 +244,13 @@ void Viewer::changeSlice(int slice)
     this->m_viewer2->SetSlice(slice);
 }
 
-
+void Viewer::updateValueDisplay(int val)
+{
+    this->ui->label_6->setText(QString::number(
+                                   this->ui->horizontalScrollBar->value()));
+    this->ui->label_7->setText(QString::number(
+                                   this->ui->horizontalScrollBar_2->value()));
+}
 
 
 void Viewer::mouseMoveCallback(vtkObject * obj, unsigned long,
