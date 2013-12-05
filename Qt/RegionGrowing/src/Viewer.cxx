@@ -89,24 +89,24 @@ void Viewer::DisplayImage()
     //    flipper->SetInput(vtkReader->GetOutput());
     //    flipper->Update();
 
-    this->m_viewer2 = vtkSmartPointer<vtkImageViewer2>::New();
+    this->m_viewer = vtkSmartPointer<vtkImageViewer2>::New();
 
-    this->m_viewer2->SetInput(vtkReader->GetOutput());
-    this->m_viewer2->SetSliceOrientationToXY();
+    this->m_viewer->SetInput(vtkReader->GetOutput());
+    this->m_viewer->SetSliceOrientationToXY();
 
     // Fixed invert y axis
     double pos[2], foc[2];
-    this->m_viewer2->GetRenderer()->GetActiveCamera()->GetPosition(pos);
-    this->m_viewer2->GetRenderer()->GetActiveCamera()->GetFocalPoint(foc);
+    this->m_viewer->GetRenderer()->GetActiveCamera()->GetPosition(pos);
+    this->m_viewer->GetRenderer()->GetActiveCamera()->GetFocalPoint(foc);
     pos[2] = -1;
-    this->m_viewer2->GetRenderer()->GetActiveCamera()->SetPosition(pos);
+    this->m_viewer->GetRenderer()->GetActiveCamera()->SetPosition(pos);
     //    std::cout<<pos[0]<<pos[1]<<pos[2]<<std::endl<<foc[0]<<foc[1]<<foc[2]<<std::endl;
 
-    this->m_viewer2->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
-    this->m_viewer2->GetRenderer()->ResetCamera();
-    this->m_viewer2->UpdateDisplayExtent();
-    this->m_viewer2->SetupInteractor(this->ui->qvtkWidget->GetInteractor());
-    this->ui->qvtkWidget->SetRenderWindow(m_viewer2->GetRenderWindow());
+    this->m_viewer->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
+    this->m_viewer->GetRenderer()->ResetCamera();
+    this->m_viewer->UpdateDisplayExtent();
+    this->m_viewer->SetupInteractor(this->ui->qvtkWidget->GetInteractor());
+    this->ui->qvtkWidget->SetRenderWindow(m_viewer->GetRenderWindow());
 
     // Disable deafult style, must done after set interactor
     this->ui->qvtkWidget->GetInteractor()->GetInteractorStyle()->EnabledOff();
@@ -115,8 +115,8 @@ void Viewer::DisplayImage()
     this->ui->qvtkWidget->GetInteractor()->SetInteractorStyle(interactorStyle);
     this->ui->qvtkWidget->GetInteractor()->Initialize();
 
-    this->m_viewer2->SetSlice(0);
-    this->m_viewer2->Render();
+    this->m_viewer->SetSlice(0);
+    this->m_viewer->Render();
 
     // Enable connections between VTK event and Qt slots
 //    VTK_CREATE(vtkEventQtSlotConnect, connection);
@@ -151,13 +151,13 @@ void Viewer::Mainfunction()
     typedef itk::ConfidenceConnectedImageFilter<ImageType, ImageType> SegmenterType;
     SegmenterType::Pointer segmenter = SegmenterType::New();
 
-//    segmenter->SetInitialNeighborhoodRadius(3);
-//    segmenter->SetMultiplier(3);  //the confidence interval is the mean plus or minus the "Multiplier" times the standard deviation
-//    segmenter->SetNumberOfIterations(5);
-//    segmenter->SetReplaceValue(255);
+    //    segmenter->SetInitialNeighborhoodRadius(3);
+    //    segmenter->SetMultiplier(3);  //the confidence interval is the mean plus or minus the "Multiplier" times the standard deviation
+    //    segmenter->SetNumberOfIterations(5);
+    //    segmenter->SetReplaceValue(255);
 
     segmenter->SetInitialNeighborhoodRadius(this->ui->horizontalScrollBar->value());
-    segmenter->SetMultiplier(this->ui->horizontalScrollBar_2->value());
+    segmenter->SetMultiplier(this->ui->horizontalScrollBar_2->value()/10.0);
     segmenter->SetNumberOfIterations(this->ui->spinBox->value());
     segmenter->SetReplaceValue(255);
 
@@ -172,8 +172,45 @@ void Viewer::Mainfunction()
     segmenter->SetInput(reader->GetOutput());
     segmenter->Update();
 
+    //  Connect itk with vtk
+    typedef itk::ImageToVTKImageFilter< ImageType > ConnectorType;
+    ConnectorType::Pointer connector = ConnectorType::New();
 
-    //
+    connector->SetInput( segmenter->GetOutput() );
+    connector->Update();
+    VTK_CREATE(vtkImageData, imageData);
+    imageData->DeepCopy( connector->GetOutput() );   // must copy mem or read empty
+
+    // display the sgemented image
+    m_segviewer = vtkSmartPointer<vtkImageViewer2>::New();
+    m_segviewer->SetInput(imageData);
+    m_segviewer->SetSliceOrientationToXY();
+    // Fixed invert y axis
+    double pos[2], foc[2];
+    m_segviewer->GetRenderer()->GetActiveCamera()->GetPosition(pos);
+    m_segviewer->GetRenderer()->GetActiveCamera()->GetFocalPoint(foc);
+    pos[2] = -1;
+    m_segviewer->GetRenderer()->GetActiveCamera()->SetPosition(pos);
+    //    std::cout<<pos[0]<<pos[1]<<pos[2]<<std::endl<<foc[0]<<foc[1]<<foc[2]<<std::endl;
+
+    m_segviewer->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
+    m_segviewer->GetRenderer()->ResetCamera();
+    m_segviewer->UpdateDisplayExtent();
+    m_segviewer->SetupInteractor(this->ui->qvtkWidget_2->GetInteractor());
+    this->ui->qvtkWidget_2->SetRenderWindow(m_segviewer->GetRenderWindow());
+
+    // Disable deafult style, must done after set interactor
+    this->ui->qvtkWidget_2->GetInteractor()->GetInteractorStyle()->EnabledOff();
+    this->ui->qvtkWidget_2->GetInteractor()->Disable();
+    VTK_CREATE(MouseInteractorStyle, interactorStyle);
+    this->ui->qvtkWidget_2->GetInteractor()->SetInteractorStyle(interactorStyle);
+    this->ui->qvtkWidget_2->GetInteractor()->Initialize();
+
+    m_segviewer->SetSlice(this->ui->verticalScrollBar->value());
+    m_segviewer->Render();
+
+
+    // write to image
     typedef itk::ImageFileWriter<ImageType> ImageWriterType;
     ImageWriterType::Pointer writer = ImageWriterType::New();
 
@@ -188,7 +225,7 @@ void Viewer::GetIntensity(unsigned int slicex,
                           unsigned int slicey,
                           unsigned int slicez)
 {
-    T *intensity = (T*)this->m_viewer2->GetInput()
+    T *intensity = (T*)this->m_viewer->GetInput()
             ->GetScalarPointer(slicex, slicey, slicez);
 
     this->ui->label_2->setText(QString(vtkVariant(intensity[0]).ToString()));
@@ -241,15 +278,22 @@ void Viewer::slotExit()
 
 void Viewer::changeSlice(int slice)
 {
-    this->m_viewer2->SetSlice(slice);
+    this->m_viewer->SetSlice(slice);
+
+    // sychronize slicing
+    if (this->m_segviewer != NULL)
+    {
+    this->m_segviewer->SetSlice(slice);
+    }
 }
+
 
 void Viewer::updateValueDisplay(int val)
 {
     this->ui->label_6->setText(QString::number(
                                    this->ui->horizontalScrollBar->value()));
     this->ui->label_7->setText(QString::number(
-                                   this->ui->horizontalScrollBar_2->value()));
+                                   this->ui->horizontalScrollBar_2->value()/10.0));
 }
 
 
@@ -265,7 +309,7 @@ void Viewer::mouseMoveCallback(vtkObject * obj, unsigned long,
     iren->GetEventPosition(event_pos);
 
     VTK_CREATE(vtkCellPicker, picker);
-    picker->Pick(event_pos[0],event_pos[1],0,m_viewer2->GetRenderer());
+    picker->Pick(event_pos[0],event_pos[1],0,m_viewer->GetRenderer());
 
     //check positoin in image
     if(picker->GetCellId() != -1) {
@@ -280,10 +324,10 @@ void Viewer::mouseMoveCallback(vtkObject * obj, unsigned long,
 
         QString str;
         str.sprintf("%d  %d  %d", picker->GetCellIJK()[0]+1,
-                    picker->GetCellIJK()[1]+1, m_viewer2->GetSlice()+1);
+                    picker->GetCellIJK()[1]+1, m_viewer->GetSlice()+1);
         this->ui->label->setText(str);
 
-        switch (this->m_viewer2->GetInput()->GetScalarType())
+        switch (this->m_viewer->GetInput()->GetScalarType())
         {
         vtkTemplateMacro(GetIntensity<VTK_TT>(picker->GetCellIJK()[0],
                                               picker->GetCellIJK()[1],
@@ -318,7 +362,7 @@ void Viewer::mouseClickCallback(vtkObject * obj, unsigned long,
     iren->GetEventPosition(event_pos);
 
     VTK_CREATE(vtkCellPicker, picker);
-    picker->Pick(event_pos[0],event_pos[1],0,m_viewer2->GetRenderer());
+    picker->Pick(event_pos[0],event_pos[1],0,m_viewer->GetRenderer());
 
     double pos[3];
     //check positoin in image
@@ -327,11 +371,11 @@ void Viewer::mouseClickCallback(vtkObject * obj, unsigned long,
 
         m_index[0] = picker->GetCellIJK()[0]+1;
         m_index[1] = picker->GetCellIJK()[1]+1;
-        m_index[2] = m_viewer2->GetSlice()+1;
+        m_index[2] = m_viewer->GetSlice()+1;
     }
 
 //    //Delete existing point
-//    vtkPolyDataCollection *actorCollection = this->m_viewer2->GetRenderer();
+//    vtkPolyDataCollection *actorCollection = this->m_viewer->GetRenderer();
 //    actorCollection->InitTraversal();
 
 //    for (vtkIdType i=0; i<actorCollection->GetNumberOfItems(); i++)
@@ -365,8 +409,8 @@ void Viewer::mouseClickCallback(vtkObject * obj, unsigned long,
     m_actor->GetProperty()->SetColor(0, 0, 1);
 
     //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
-    this->m_viewer2->GetRenderer()->AddActor(m_actor);
-    this->m_viewer2->Render();
+    this->m_viewer->GetRenderer()->AddActor(m_actor);
+    this->m_viewer->Render();
 
 
 }

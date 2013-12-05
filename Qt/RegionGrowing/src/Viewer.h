@@ -50,7 +50,8 @@ private:
 
     std::string m_filename;
     Ui_Viewer *ui;
-    vtkSmartPointer<vtkImageViewer2> m_viewer2;
+    vtkSmartPointer<vtkImageViewer2> m_viewer;
+    vtkSmartPointer<vtkImageViewer2> m_segviewer;
     double m_index[3];
     vtkSmartPointer<vtkSphereSource> m_sphereSource;
     vtkSmartPointer<vtkActor> m_actor;
