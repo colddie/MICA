@@ -170,13 +170,14 @@ void ArgumentParser::DeleteArg(vector<string> &vec, const string &arg, const cha
 /* parse the commandline arguments */
 void ArgumentParser::SetCommandLineArg(int argc, char *argv[], const char *help[])
 {
+
     m_args.reserve(argc-1);
     m_args.insert(m_args.begin(), argv+1, argv+argc);
 
     if (m_args.empty() || m_args.size() == 1) {
         cout<<(*help)<<endl; exit(EXIT_FAILURE);
     }
-    m_sortargs.reserve(argc-1);
+    m_sortargs.resize(argc-1);
     copy(m_args.begin(),m_args.end(),m_sortargs.begin());
     sort(m_sortargs.begin(),m_sortargs.end());
 }

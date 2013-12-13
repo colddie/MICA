@@ -8,8 +8,16 @@
 #include <iostream>
 #include <iterator>
 #include <vector>
+#include <QThread>
 
 
+class Sleeper : public QThread
+{
+public:
+    static void usleep(unsigned long usecs){QThread::usleep(usecs);}
+    static void msleep(unsigned long msecs){QThread::msleep(msecs);}
+    static void sleep(unsigned long secs){QThread::sleep(secs);}
+};
 
 
 namespace std {
@@ -34,10 +42,10 @@ inline ostream& operator<<(ostream &os, const vector<T> &vec)
 template <typename T>
 inline string vectorToString(const vector<T> &vec)
 {
-stringstream stream;
-copy(vec.begin(), vec.end(), ostream_iterator<T>(stream, " "));
+    stringstream stream;
+    copy(vec.begin(), vec.end(), ostream_iterator<T>(stream, " "));
 
-return stream.str();
+    return stream.str();
 }
 
 
